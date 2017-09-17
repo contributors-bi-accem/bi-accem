@@ -1,19 +1,12 @@
 
-SET @ts_format='%Y-%m-%d_%H:%i:%S';
+SET @ts_format='%Y-%m-%d %H:%i:%S';
 SET @date_format='%Y-%m-%d';
-SET @fieldseparator='¬';
-SET @endofline='\n';
-SET @table_prefix='ods_';
 SET @load_ts=NOW();
 
 -- recarga total de la tabla ods_descripteur
-SET @extract = 'descripteur';
-SET @table = CONCAT(@table_prefix,@extract);
-SET @input_file = CONCAT(@datafile_dir, @file_prefix, @table,"_",@file_date,".dat");
-SET @query = CONCAT(
-  "LOAD DATA INFILE '", @input_file, "' REPLACE INTO TABLE `", @table, "` 
-  FIELDS TERMINATED BY '", @fieldseparator, "'
-  LINES TERMINATED BY '", @endofline, "' 
+  LOAD DATA INFILE '{descripteur_file}' REPLACE INTO TABLE `ods_descripteur` 
+  FIELDS TERMINATED BY '{fieldseparator}'
+  LINES TERMINATED BY '{endofline}' 
   (`T_DESCRIPTEUR_ID`,
   `LibelleDescripteur`,
   `SautDescripteur`,
@@ -27,12 +20,9 @@ SET @query = CONCAT(
   @data_date1,
   @load_date)
   SET
-  data_date=str_to_date(@data_date1,'",@ts_format,"'),
-  load_date=@load_ts;");
-SELECT @query;
-PREPARE query FROM @query;
-EXECUTE query;
-DEALLOCATE PREPARE query;
+  data_date=str_to_date(@data_date1,@ts_format),
+  load_date=@load_ts;
+
 
 /*
 -- Descarga total de la tabla modalite
