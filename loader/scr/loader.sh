@@ -34,6 +34,8 @@ exec 1>>"$logs_path""$logfile_prefix"$(date +'%Y-%m-%d').log 2>&1
 # inicialización de variables
 inicio=$(date +'%s');
 str_now=$(date -d @$inicio +'%Y-%m-%d %H:%M:%S');
+tables=( "descripteur" "modalite" "observation" "obs_descript" "obs_mod" "personne" "questionnaire" 
+    "compte" "groupe" "lier_groupe" "liste_droits" "QuestionComplexe" "succursale_groupe" )
 resultado=0;
 
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
@@ -57,20 +59,22 @@ for datafile in `ls "$datafile_dir""$datafile_prefix"*.tar.gz | sort -V`; do
         printf "Info: ficheros descomprimidos, lanzamos las queries.\n"
 
         # remplazamos variables en el fichero sql
-
         # fichero sql original
-        sql_file="$base_dir"sql/load_ods1.sql
+        sql_file="$base_dir"sql/load_ods.sql
 
         # fichero sql temporal con las variables sustituidas
         temp_sql_file="$base_dir"sql/.temp_load_ods.sql
 
-        descripteur_file="$datafile_dir""$datafile_prefix"descripteur_"$file_date".dat
-        fieldseparator="¬";
-        endofline="\n";
+        replacestr="";
+        for t in tables; do
+            replacestr=$replacestr"s|{"$t"_file}|""$datafile_dir""$datafile_prefix""$t""$file_date"".dat|g;"
+        done;
+        replacestr="$replacestrs""|{fieldseparator}|"$fieldseparator"|g;
+        s|{endofline}|"$endofline"|g";
+        printf "remplazos en sql: %s\n" "$replacestr";
 
-        sed -e "s|{descripteur_file}|"$descripteur_file"|g;
-        s|{fieldseparator}|"$fieldseparator"|g;
-        s|{endofline}|"$endofline"|g" < "$sql_file" > "$temp_sql_file";
+        # remplazamos las cadenas de caracteres en el fichero sql
+        sed -e "$replacestr" < "$sql_file" > "$temp_sql_file";
 
         # lanzamos el script sql
         mysql --login-path="$mysql_loginpath" --database="$mysql_db" --execute="source ${temp_sql_file};"
@@ -87,6 +91,9 @@ for datafile in `ls "$datafile_dir""$datafile_prefix"*.tar.gz | sort -V`; do
             # movemos el fichero al directorio de exitos
             mv "$datafile" "$bck_success_dir"
         fi
+
+        #borramos el fichero sql temporal
+        rm "$temp_sql_file";
     else
         printf "Error: No se ha conseguido descomprimir el fichero %s\n" "$datafile" >&2
 
