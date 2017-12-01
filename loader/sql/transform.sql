@@ -5,102 +5,67 @@ SET @load_ts=NOW();
 SET sql_mode='';
 
 
-CREATE TABLE IF NOT EXISTS `th_obs_mod` (
-`id_obs_mod` int(11) NULL,
-`T_OBSERVATION_ID` int(11),
-`T_DESCRIPTEUR_ID` int(11),
-`session` int(11),
-`T_MODALITE_ID` int(11),
-`date_debut` datetime NULL,
-`date_fin` datetime NULL,
-`id_enq` int(11) NULL,
-`Fecha_Modificacion` timestamp NULL,
-`CodeObservation` varchar(50) NULL,
-`created` datetime NULL,
-`id_enqu` int(11) NULL,
-`ObservationPublic` varchar(10) NULL,
-`ObservationValide` varchar(10) NULL,
-`verouiller` binary(1),
-`data_date` timestamp NULL,
-`load_date` timestamp NULL, 
--- UNIQUE KEY (`T_OBSERVATION_ID`,`T_DESCRIPTEUR_ID`,`session`,`T_MODALITE_ID`)
-UNIQUE KEY (`id_obs_mod`),
-INDEX (`T_OBSERVATION_ID`,`T_DESCRIPTEUR_ID`,`session`,`T_MODALITE_ID`)
-);
+-- recarga incremental de la tabla th_obs_mod
 
--- recarga total de la tabla th_obs_mod
 REPLACE INTO `th_obs_mod`
 (
     SELECT 
-    A.`id_obs_mod`,
-    A.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
+    `id_obs_mod`,
+    `ods_obs_mod`.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
     `T_DESCRIPTEUR_ID`,
-    A.`session` as `session`,
-    A.`T_MODALITE_ID` as`T_MODALITE_ID`,
-    A.`date_debut` as `date_debut`,
-    A.`date_fin` as `date_fin`,
-    A.`id_enq` as `id_enq`,
-    A.`Fecha_Modificacion` as `Fecha_Modificacion`,
+    `session`,
+    `ods_obs_mod`.`T_MODALITE_ID` as`T_MODALITE_ID`,
+    `date_debut`,
+    `date_fin`,
+    `id_enq`,
+    `ods_obs_mod`.`Fecha_Modificacion` as `Fecha_Modificacion`,
     `CodeObservation`,
     `created`,
     `id_enqu`,
     `ObservationPublic`,
     `ObservationValide`,
     `verouiller`,
-    A.`data_date` as `data_date`,
+    `ods_obs_mod`.`data_date` as `data_date`,
     @load_ts
     FROM  
-    `ods_obs_mod` as A
+    `ods_obs_mod`
     LEFT JOIN 
-    `ods_modalite`
-    ON A.`T_MODALITE_ID`=`ods_modalite`.`T_MODALITE_ID`
+    `ods_modalite` 
+    ON `ods_obs_mod`.`T_MODALITE_ID`=`ods_modalite`.`T_MODALITE_ID`
     LEFT JOIN 
     `ods_observation`
-    ON A.`T_OBSERVATION_ID`=`ods_observation`.`T_OBSERVATION_ID`
+    ON `ods_obs_mod`.`T_OBSERVATION_ID`=`ods_observation`.`T_OBSERVATION_ID`
     WHERE 
-    `ods_observation`.`T_QUESTIONNAIRE_ID`=453 
+    `ods_observation`.`T_QUESTIONNAIRE_ID`=453  
     -- AND `ods_observation`.`ObservationValide`='true'
+    AND `ods_obs_mod`.`data_date`>(SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `th_obs_mod`)
 );
 
+/*
+modalidad   9074    Prestación
+modalidad	8620	Tipo de Programa
+modalidad	8621	Financiación del Programa
+modalidad	9109	Convocatoria del programa
+modalidad	8945	Provincia
+modalidad	8947	Comunidad
+observación	8582	Nombre Persona
+observación	8583	Primer Apellido
+observación	8584	Segundo Apellido
+modalidad	8593	Nacionalidad
+modalidad	8592	Pais de Nacimiento
+modalidad	8610	Situación administrativa
+modalidad	8619	Nivel de estudios
+modalidad	8590	Sexo
+observación	8586	NIE
+observación	8588	DNI
+observación	8587	Pasaporte
+observación	8585	Numero Asilo
+observación	8591	Fecha Nacimiento
+modalidad	8611	Solicitante de protección internacional
+modalidad	8612	Inmigrante
+*/
 
-
-CREATE TABLE IF NOT EXISTS `th_prestaciones` (
-`T_OBSERVATION_ID` int(11),
-`CodeObservation` varchar(50) NULL,
-`session` int(11) NULL,
-`created` datetime NULL,
-`id_enqu` int(11) NULL,
-`ObservationPublic` varchar(10) NULL,
-`ObservationValide` varchar(10) NULL,
-`verouiller` binary(1),
-`date_debut` datetime NULL,
-`date_fin` datetime NULL, 
-`cod_prest` int(11) NULL, -- WHERE [T_DESCRIPTEUR_ID]='9074'; // esa pregunta corresponde a una prestación
-`cod_tiprog` int(11) NULL,
-`cod_finprog` int(11) NULL,
-`cod_convprog` int(11) NULL,
-`cod_prov` int(11) NULL,
-`cod_comu` int(11) NULL,
-`Nombre Persona` longtext NULL,
-`Primer Apellido` longtext NULL,
-`Segundo Apellido` longtext NULL,
-`cod_nacion` int(11) NULL,
-`cod_paisnacim` int(11) NULL,
-`cod_situadmin` int(11) NULL,
-`cod_nivelstud` int(11) NULL,
-`cod_genero` int(11) NULL,
-`NIE` varchar(150) NULL,
-`DNI` varchar(150) NULL,
-`Pasaporte` varchar(150) NULL,
-`Numero Asilo` varchar(150) NULL,
-`Fecha Nacimiento` varchar(150) NULL,
-`cod_solprotec` int(11) NULL,
-`cod_inmi` int(11) NULL,
-`data_date` timestamp NULL,
-`load_date` timestamp NULL,   
-UNIQUE KEY (`T_OBSERVATION_ID`,`session`,`cod_prest`)
-);
-
+-- recarga incremental de la tabla th_prestaciones
 
 REPLACE INTO `th_prestaciones`
 (
@@ -154,7 +119,9 @@ REPLACE INTO `th_prestaciones`
     `data_date`
     FROM 
     `th_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=9074) as A
+    WHERE 
+    `ods_obs_mod`.`data_date`>(SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `th_prestaciones`)
+    AND `T_DESCRIPTEUR_ID`=9074) as A
     LEFT JOIN 
     (SELECT 
     `T_OBSERVATION_ID`,
@@ -303,58 +270,309 @@ REPLACE INTO `th_prestaciones`
     ON A.`T_OBSERVATION_ID`=DH.`T_OBSERVATION_ID`
     AND A.`session`=DH.`session`
     AND DH.`T_DESCRIPTEUR_ID`=8591
-
 );
-/*
-modalidad 9074  Prestación
-modalidad	8620	Tipo de Programa
-modalidad	8621	Financiación del Programa
-modalidad	9109	Convocatoria del programa
-modalidad	8945	Provincia
-modalidad	8947	Comunidad
-observación	8582	Nombre Persona
-observación	8583	Primer Apellido
-observación	8584	Segundo Apellido
-modalidad	8593	Nacionalidad
-modalidad	8592	Pais de Nacimiento
-modalidad	8610	Situación administrativa
-modalidad	8619	Nivel de estudios
-modalidad	8590	Sexo
-observación	8586	NIE
-observación	8588	DNI
-observación	8587	Pasaporte
-observación	8585	Numero Asilo
-observación	8591	Fecha Nacimiento
-modalidad	8611	Solicitante de protección internacional
-modalidad	8612	Inmigrante
-*/
 
 
-/*SELECT `T_OBSERVATION_ID`,`session`,`T_MODALITE_ID`,`date_debut`,`date_fin`,
-    ANY_VALUE(`CodeObservation`),
-    ANY_VALUE(`created`),
-    ANY_VALUE(`id_enqu`)
-    FROM `ods_obs_mod`
+-- recarga de las dimensiones
+
+REPLACE INTO `td_prestacion`
+(
+    SELECT 
+    A.`cod_prest`,
+    B.`LibelleModalite` as `Prestación`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_prest`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=9074
+    GROUP BY `T_MODALITE_ID`) as A
     LEFT JOIN 
-    `ods_modalite`
-    USING (`T_MODALITE_ID`)
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_prest`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_tipoprograma`
+(
+    SELECT 
+    A.`cod_tiprog`,
+    B.`LibelleModalite` as `Tipo de Programa`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_tiprog`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8620
+    GROUP BY `T_MODALITE_ID`) as A
     LEFT JOIN 
-    `ods_observation`
-    USING (`T_OBSERVATION_ID`)
-    WHERE 
-    `ods_modalite`.`T_DESCRIPTEUR_ID`=9074
-    AND `ods_observation`.`T_QUESTIONNAIRE_ID`=453 
-    AND `ods_observation`.`ObservationValide`='true'
-    GROUP BY `T_OBSERVATION_ID`,`session`,`T_MODALITE_ID`,`date_debut`,`date_fin`
-    LIMIT 100
-    
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_tiprog`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_finprograma`
+(
+    SELECT 
+    A.`cod_finprog`,
+    B.`LibelleModalite` as `Financiación del Programa`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_finprog`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8621
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_finprog`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_convprograma`
+(
+    SELECT 
+    A.`cod_convprog`,
+    B.`LibelleModalite` as `Convocatoria del programa`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_convprog`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=9109
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_convprog`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_provincia`
+(
+    SELECT 
+    A.`cod_prov`,
+    B.`LibelleModalite` as `Provincia`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_prov`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8945
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_prov`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_comunidad`
+(
+    SELECT 
+    A.`cod_comu`,
+    B.`LibelleModalite` as `Comunidad`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_comu`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8947
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_comu`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_nacionalidad`
+(
+    SELECT 
+    A.`cod_nacion`,
+    B.`LibelleModalite` as `Nacionalidad`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_nacion`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8593
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_nacion`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_pais`
+(
+    SELECT 
+    A.`cod_pais`,
+    B.`LibelleModalite` as `Pais de Nacimiento`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_pais`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8592
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_pais`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_situadmin`
+(
+    SELECT 
+    A.`cod_situadmin`,
+    B.`LibelleModalite` as `Situación administrativa`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_situadmin`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8610
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_situadmin`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_nivelestud`
+(
+    SELECT 
+    A.`cod_nivelstud`,
+    B.`LibelleModalite` as `Nivel de estudios`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_nivelstud`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8619
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_nivelstud`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_genero`
+(
+    SELECT 
+    A.`cod_genero`,
+    B.`LibelleModalite` as `Sexo`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_genero`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8590
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_genero`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_solprotec`
+(
+    SELECT 
+    A.`cod_solprotec`,
+    B.`LibelleModalite` as `Solicitante de protección internacional`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_solprotec`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8611
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_solprotec`=B.`T_MODALITE_ID`
+);
+
+REPLACE INTO `td_inmigrante`
+(
+    SELECT 
+    A.`cod_inmi`,
+    B.`LibelleModalite` as `Inmigrante`,
+    A.`data_date`,
+    A.`load_date`
+    FROM
+    (SELECT 
+    `T_DESCRIPTEUR_ID`,
+    `T_MODALITE_ID` as `cod_inmi`,
+    MAX(`data_date`) as `data_date`,
+    @load_ts as `load_date`
+    FROM 
+    `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8612
+    GROUP BY `T_MODALITE_ID`) as A
+    LEFT JOIN 
+    `ods_modalite` as B
+    ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND A.`cod_inmi`=B.`T_MODALITE_ID`
+);
 
 
 
-
-
-
-(SELECT distinct(`T_OBSERVATION_ID`,`session`,`cod_prest`,`date_debut`,`date_fin`), `T_MODALITE_ID` as `cod_tiprog`
-FROM `ods_obs_mod` WHERE `T_DESCRIPTEUR_ID`=8620)
-USING (`T_OBSERVATION_ID`,`session`,`cod_prest`,`date_debut`,`date_fin`);
-*/

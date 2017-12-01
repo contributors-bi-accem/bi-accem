@@ -40,9 +40,9 @@ if [ ! -e "$sql_file" ]; then
     exit 1;
 fi 
 
-# lanzamos el script sql de staging
-sql_file="$base_dir"sql/staging.sql
-mysql --login-path="$mysql_loginpath" --database="$mysql_db" --execute="source ${sql_file};"
+# lanzamos el script sql
+#sql_file="$base_dir"sql/staging.sql
+mysql --login-path="$mysql_loginpath" -vv --database="$mysql_db" --show-warnings --execute="source ${sql_file};"
 
 resultado=$?
 

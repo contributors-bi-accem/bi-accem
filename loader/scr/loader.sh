@@ -63,7 +63,7 @@ for datafile in `ls "$datafile_dir""$datafile_prefix"*.tar.gz | sort -V`; do
         sed -e "$replacestr" < "$sql_file" > "$temp_sql_file";
 
         # lanzamos el script sql
-        mysql --login-path="$mysql_loginpath" --database="$mysql_db" --execute="source ${temp_sql_file};"
+        mysql --login-path="$mysql_loginpath" -vv --database="$mysql_db" --show-warnings --execute="source ${temp_sql_file};"
         
         res_sql=$?
         if [ "$res_sql" -ne 0 ]; then

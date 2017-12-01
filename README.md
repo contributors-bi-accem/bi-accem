@@ -53,3 +53,18 @@ y especificar la frecuencia deseada.
 - Si no se especifica ningun parametro, el script toma como fecha minima la fecha guardada en el fichero ```.lastdate```. Si el fichero no esta presente o legible, como por ejemplo en la primera ejecución, el script usa la fecha "1900-01-01 00:00:00".
 
 En resumen, los parametros permiten forzar las fechas minima y maxima de extracción, pero solo con lanzar el script sin parametro debería funcionar según lo esperado.
+
+# Script de carga y procesamiento (carpeta loader)
+
+## Instrucciones de instalación:
+
+1. Crear una base de datos MySql.
+2. Crear un usuario de escritura ```usuario_escritura``` en la base de datos MySQL (distinta del e-gorrion)
+3. Crear un usuario de acceso en Linux ```usuario_linux``` en el servvidor de la BBDD espejo con una contraseña fuerte.
+3. Crear una carpeta ```carpeta_datos``` con 30 GB disponibles donde se van a descargar los ficheros
+4. Crear una carpeta ```carpeta_logs``` con 1 GB disponible para almacenar los logs
+5. Crear una carpeta ```carpeta_sw``` con 10 MB disponible para copiar los scripts.
+6. Configurar la seguridad de MySQL para que el servidor MySQL (usuario mysql en linux) pueda escribir en el directorio ```carpeta_datos```:
+- Configurar el parametro secure_file_priv en: 
+  - Editar el fichero ```/etc/mysql/mysql.conf.d/mysqld.cnf``` y añadir la línea: 
+ 

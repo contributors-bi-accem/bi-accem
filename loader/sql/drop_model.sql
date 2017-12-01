@@ -1,7 +1,7 @@
 
 
 --
--- Base de datos de la replica del `EGORRION`
+-- Borra las tablas del datamart.
 --
 
 DROP TABLE `stg_descripteur`;
