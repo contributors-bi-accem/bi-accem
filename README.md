@@ -33,9 +33,12 @@ Contribuciones para el reporting de la organización
     mysql --login-path=/home/<usuario_linux>/.mylogin.cnf
     ```
    Si se abre sesión en mysql, todo OK.
+   
 8. Copiar la carpeta unload del paquete de sw en ```carpeta_sw```, poner permisos de ejecución al fichero ```unload/scr/unload.sh``` y adaptar el fichero ```unload/conf/params.conf``` a los parametros del entorno (rutas, etc).
+
 9. Lanzar una prueba con <carpeta_sw>/unload/scr/unload.sh "2017-09-18 00:00:00". Los logs se crean en la carpeta logs configurada en los parametros (unload/conf/params.conf)
-10. Planificar la ejecución del script unload.sh por ejemplo cada mañana a las 00:30 o cada x horas: con el usuario ```usuario_linux_egorrion```, lanzar: 
+
+10. Planificar la ejecución del script ```unload.sh``` por ejemplo cada mañana a las 00:30 o cada x horas: con el usuario ```usuario_linux_egorrion```, lanzar: 
 ```
 crontab -e
 ```
@@ -83,6 +86,7 @@ ssh-copy-id usuario_linux_egorrion@IP-servidor-e-gorrion
      carpeta_datos/ rw,
      carpeta_datos/** rw,
      ```
+
 7. Con el usuario linux ```usuario_linux_local```, ejecutar la utilidad mysql_config_editor para crear un fichero de credenciales del usuario MySql ```usuario_lectura```:
     ```
     mysql_config_editor set --login-path=client --host=localhost --user=<usuario_lectura> --password
@@ -93,8 +97,10 @@ ssh-copy-id usuario_linux_egorrion@IP-servidor-e-gorrion
     mysql --login-path=/home/<usuario_linux>/.mylogin.cnf
     ```
    Si se abre sesión en mysql, todo OK. 
-8. Copiar la carpeta loader del paquete de sw en ```carpeta_sw```, poner permisos de ejecución al fichero ```loader/scr/main.sh```,```loader/scr/loader.sh``` y ```loader/scr/execute-sql.sh``` y adaptar el fichero ```loader/conf/params.conf``` a los parametros del entorno (rutas, etc).
-9. Planificar la ejecución del script unload.sh por ejemplo cada mañana a las 00:30 o cada x horas: con el usuario ```usuario_linux_local```, lanzar: 
+
+8. Copiar la carpeta loader del paquete de sw en ```carpeta_sw```, poner permisos de ejecución al fichero ```loader/scr/main.sh```,```loader/scr/remote-copy.sh```,```loader/scr/loader.sh``` y ```loader/scr/execute-sql.sh``` y adaptar el fichero ```loader/conf/params.conf``` a los parametros del entorno (rutas, etc).
+
+9. Planificar la ejecución del script ```main.sh``` por ejemplo cada mañana a las 01:30 o cada x horas: con el usuario ```usuario_linux_local```, lanzar: 
 ```
 crontab -e
 ```
