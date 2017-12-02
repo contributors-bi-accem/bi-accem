@@ -38,25 +38,24 @@ resultado=0;
 
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
 
-# Recuperamos los ficheros
-"$base_dir"scr/remote-copy.sh
+# Lanzamos la descarga en remoto
+ssh -p "$port" -i "$private_key" "$user"@"$server" "$remote_scr_dir"unload.sh
 resultado=$?
+
+# Recuperamos los ficheros
+if [ "$resultado" == 0 ]; then
+    "$base_dir"scr/remote-copy.sh
+    resultado=$?
+fi
 
 # Lanzamos el loader
 if [ "$resultado" == 0 ]; then
-    fin=$(date +'%s');
-    duration=$(( $fin - $inicio ));
-    printf "Info: Descarga finalizada en %u min %u sec. Iniciando carga en base de datos.\n" $(($duration/60)) $(($duration%60))
     "$base_dir"scr/loader.sh
     resultado=$?
 fi
 
 # Lanzamos el staging
 if [ "$resultado" == 0 ]; then
-    fin=$(date +'%s');
-    duration=$(( $fin - $inicio ));
-    printf "Info: Carga finalizada en %u min %u sec. Iniciando fase de staging.\n" $(($duration/60)) $(($duration%60))
-
     sql_file="$base_dir"sql/staging.sql
     "$base_dir"scr/execute-sql.sh "$sql_file"
     resultado=$?
@@ -64,10 +63,6 @@ fi
 
 # Lanzamos las transformaciones
 if [ "$resultado" == 0 ]; then
-    fin=$(date +'%s');
-    duration=$(( $fin - $inicio ));
-    printf "Info: Staging finalizado en %u min %u sec. Iniciando transformaciones.\n" $(($duration/60)) $(($duration%60))
-
     sql_file="$base_dir"sql/transform.sql
     "$base_dir"scr/execute-sql.sh "$sql_file"
     resultado=$?

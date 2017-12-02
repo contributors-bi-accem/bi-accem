@@ -120,7 +120,7 @@ REPLACE INTO `th_prestaciones`
     FROM 
     `th_obs_mod`
     WHERE 
-    `ods_obs_mod`.`data_date`>(SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `th_prestaciones`)
+    `data_date`>(SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `th_prestaciones`)
     AND `T_DESCRIPTEUR_ID`=9074) as A
     LEFT JOIN 
     (SELECT 

@@ -33,14 +33,20 @@ if [ ! -e "$private_key" ]; then
 fi
 
 # descargamos los ficheros al servidor local
-scp -q -P 979 -i "$private_key" "$user"@"$server":"$remote_dir""$datafile_prefix"*.tar.gz "$datafile_dir"
+scp -q -P "$port" -i "$private_key" "$user"@"$server":"$remote_data_dir""$datafile_prefix"*.tar.gz "$datafile_dir"
 resultado=$?
 
 if [ "$resultado" -eq 0 ]; then
+    fin=$(date +'%s');
+    duration=$(( $fin - $inicio ));
+    printf "Info: Fichero(s) descargado(s) en %u min %u sec. Los borramos del servidor remoto.\n" $(($duration/60)) $(($duration%60))
     # borramos los ficheros remotos
-    ssh -q -P 979 -i "$private_key" "$user"@"$server" rm -f "$remote_dir""$datafile_prefix"*.tar.gz
+    ssh -p "$port" -i "$private_key" "$user"@"$server" rm -f "$remote_dir""$datafile_prefix"*.tar.gz
     resultado=$?
-done;
+    if [ "$resultado" -eq 0 ]; then
+        printf "Error: No se han podido borrar los ficheros del servidor remoto.\n"
+    fi
+fi
 
 # Devolvemos el resultado
 if [ "$resultado" -eq 0 ]; then
