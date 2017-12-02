@@ -39,16 +39,24 @@ resultado=0;
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
 
 # Recuperamos los ficheros
-
+"$base_dir"scr/remote-copy.sh
+resultado=$?
 
 # Lanzamos el loader
 if [ "$resultado" == 0 ]; then
+    fin=$(date +'%s');
+    duration=$(( $fin - $inicio ));
+    printf "Info: Descarga finalizada en %u min %u sec. Iniciando carga en base de datos.\n" $(($duration/60)) $(($duration%60))
     "$base_dir"scr/loader.sh
     resultado=$?
 fi
 
 # Lanzamos el staging
 if [ "$resultado" == 0 ]; then
+    fin=$(date +'%s');
+    duration=$(( $fin - $inicio ));
+    printf "Info: Carga finalizada en %u min %u sec. Iniciando fase de staging.\n" $(($duration/60)) $(($duration%60))
+
     sql_file="$base_dir"sql/staging.sql
     "$base_dir"scr/execute-sql.sh "$sql_file"
     resultado=$?
@@ -56,6 +64,10 @@ fi
 
 # Lanzamos las transformaciones
 if [ "$resultado" == 0 ]; then
+    fin=$(date +'%s');
+    duration=$(( $fin - $inicio ));
+    printf "Info: Staging finalizado en %u min %u sec. Iniciando transformaciones.\n" $(($duration/60)) $(($duration%60))
+
     sql_file="$base_dir"sql/transform.sql
     "$base_dir"scr/execute-sql.sh "$sql_file"
     resultado=$?
@@ -74,7 +86,7 @@ find "$logs_path""$logfile_prefix"*.tar.gz -type f -mtime +"$logfile_del" -delet
 if [ "$resultado" -eq 0 ]; then
     fin=$(date +'%s');
     duration=$(( $fin - $inicio ));
-    printf "Info: Carga finalizada en %u min %u sec.\n" $(($duration/60)) $(($duration%60))
+    printf "Info: Carga completa finalizada en %u min %u sec.\n" $(($duration/60)) $(($duration%60))
 else 
     printf "Error: Script finalizado con errores.\n"
 fi
