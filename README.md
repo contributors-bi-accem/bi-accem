@@ -27,16 +27,16 @@ Contribuciones para el reporting de la organización
     ```
     mysql_config_editor set --login-path=client --host=localhost --user=<usuario_lectura> --password
     ```
-  - Por defecto, esa utilidad crea ese fichero en /home/<usuario_linux>/.mylogin.cnf
-  - Comprobar que el fichero de credenciales está correctamente creado lanzando el comando:
+  - Por defecto, esa utilidad crea ese fichero en ```/home/<usuario_linux_egorrion>/.mylogin.cnf```
+  - Comprobar que el fichero de credenciales está correctamente creado lanzando el comando:
     ```
-    mysql --login-path=/home/<usuario_linux>/.mylogin.cnf
+    mysql --login-path=/home/<usuario_linux_egorrion>/.mylogin.cnf
     ```
    Si se abre sesión en mysql, todo OK.
    
 8. Copiar la carpeta unload del paquete de sw en ```carpeta_sw```, poner permisos de ejecución al fichero ```unload/scr/unload.sh``` y adaptar el fichero ```unload/conf/params.conf``` a los parametros del entorno (rutas, etc).
 
-9. Lanzar una prueba con <carpeta_sw>/unload/scr/unload.sh "2017-09-18 00:00:00". Los logs se crean en la carpeta logs configurada en los parametros (unload/conf/params.conf)
+9. Lanzar una prueba con ```<carpeta_sw>/unload/scr/unload.sh "2017-09-18 00:00:00"```. Los logs se crean en la carpeta logs configurada en los parametros (unload/conf/params.conf)
 
 10. Planificar la ejecución del script ```unload.sh``` por ejemplo cada mañana a las 00:30 o cada x horas: con el usuario ```usuario_linux_egorrion```, lanzar: 
 ```
