@@ -571,7 +571,7 @@ CREATE TABLE IF NOT EXISTS `th_prestaciones` (
 `Primer Apellido` longtext NULL,
 `Segundo Apellido` longtext NULL,
 `cod_nacion` int(11) NULL,
-`cod_paisnacim` int(11) NULL,
+`cod_pais` int(11) NULL,
 `cod_situadmin` int(11) NULL,
 `cod_nivelstud` int(11) NULL,
 `cod_genero` int(11) NULL,
@@ -584,6 +584,6 @@ CREATE TABLE IF NOT EXISTS `th_prestaciones` (
 `cod_inmi` int(11) NULL,
 `data_date` timestamp NULL,
 `load_date` timestamp NULL,   
-UNIQUE KEY (`T_OBSERVATION_ID`,`session`,`cod_prest`),
+UNIQUE KEY (`T_OBSERVATION_ID`,`session`,`cod_prest`,`date_debut`,`date_fin`),
 INDEX th_prestaciones_dd(`data_date`)
 );

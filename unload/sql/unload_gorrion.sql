@@ -166,30 +166,6 @@ EXECUTE query;
 DEALLOCATE PREPARE query;
 
 
--- Descarga total de la tabla QuestionComplexe
-SET @table = 'QuestionComplexe';
-SET @output_file = CONCAT(@unload_dir, @file_prefix, @table,"_",DATE_FORMAT(@to_ts,@file_datefmt),".dat");
-SET @query = CONCAT(
-  "SELECT `id_question_complexe`,
-  `type_filtre`,
-  `defaut`,
-  `rang`,
-  `param`,
-  `maj_auto`,
-  `editable`,
-  `unique_maj`,
-  `id_question`,
-  `format`,
-  '", @to_ts, "' as `unload_dt`
-FROM `",@table,"` 
-INTO OUTFILE '", @output_file, "'
-FIELDS TERMINATED BY '", @fieldseparator, "'
-LINES TERMINATED BY '", @endofline, "';");
-PREPARE query FROM @query;
-EXECUTE query;
-DEALLOCATE PREPARE query;
-
-
 -- Descarga total de la tabla personne
 SET @table = 'personne';
 SET @output_file = CONCAT(@unload_dir, @file_prefix, @table,"_",DATE_FORMAT(@to_ts,@file_datefmt),".dat");

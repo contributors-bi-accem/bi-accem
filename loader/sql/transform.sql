@@ -46,8 +46,11 @@ modalidad   9074    Prestación
 modalidad	8620	Tipo de Programa
 modalidad	8621	Financiación del Programa
 modalidad	9109	Convocatoria del programa
+
 modalidad	8945	Provincia
 modalidad	8947	Comunidad
+observación 8603    Distrito
+observación 8602    Municipio
 observación	8582	Nombre Persona
 observación	8583	Primer Apellido
 observación	8584	Segundo Apellido
@@ -63,6 +66,17 @@ observación	8585	Numero Asilo
 observación	8591	Fecha Nacimiento
 modalidad	8611	Solicitante de protección internacional
 modalidad	8612	Inmigrante
+observación 8577    Alta usuario
+sitlegalinm 8389 o 8612 
+sitlegalasil 8385 o 8611
+estudiossn  8322
+nivelestudios   8421
+nivelestudios2  8321 o 8619
+situacionlaboral    8305 o 8805
+Asentamiento
+estciv
+poseedoc
+tipodoc
 */
 
 -- recarga incremental de la tabla th_prestaciones
@@ -90,7 +104,7 @@ REPLACE INTO `th_prestaciones`
     DB.`valeur` as `Primer Apellido`,
     DC.`valeur` as `Segundo Apellido`,
     G.`T_MODALITE_ID` as cod_nacion,
-    H.`T_MODALITE_ID` as cod_paisnacim,
+    H.`T_MODALITE_ID` as cod_pais,
     I.`T_MODALITE_ID` as cod_situadmin,
     J.`T_MODALITE_ID` as cod_nivelstud,
     K.`T_MODALITE_ID` as cod_genero,
@@ -233,42 +247,34 @@ REPLACE INTO `th_prestaciones`
     LEFT JOIN 
     `ods_obs_descript` AS DA
     ON A.`T_OBSERVATION_ID`=DA.`T_OBSERVATION_ID`
-    AND A.`session`=DA.`session`
     AND DA.`T_DESCRIPTEUR_ID`=8582
     LEFT JOIN 
     `ods_obs_descript` AS DB
     ON A.`T_OBSERVATION_ID`=DB.`T_OBSERVATION_ID`
-    AND A.`session`=DB.`session`
     AND DB.`T_DESCRIPTEUR_ID`=8583
     LEFT JOIN 
     `ods_obs_descript` AS DC
     ON A.`T_OBSERVATION_ID`=DC.`T_OBSERVATION_ID`
-    AND A.`session`=DC.`session`
     AND DC.`T_DESCRIPTEUR_ID`=8584
     LEFT JOIN 
     `ods_obs_descript` AS DD
     ON A.`T_OBSERVATION_ID`=DD.`T_OBSERVATION_ID`
-    AND A.`session`=DD.`session`
     AND DD.`T_DESCRIPTEUR_ID`=8586
     LEFT JOIN 
     `ods_obs_descript` AS DE
     ON A.`T_OBSERVATION_ID`=DE.`T_OBSERVATION_ID`
-    AND A.`session`=DE.`session`
     AND DE.`T_DESCRIPTEUR_ID`=8588
     LEFT JOIN 
     `ods_obs_descript` AS DF
     ON A.`T_OBSERVATION_ID`=DF.`T_OBSERVATION_ID`
-    AND A.`session`=DF.`session`
     AND DF.`T_DESCRIPTEUR_ID`=8587
     LEFT JOIN 
     `ods_obs_descript` AS DG
     ON A.`T_OBSERVATION_ID`=DG.`T_OBSERVATION_ID`
-    AND A.`session`=DG.`session`
     AND DG.`T_DESCRIPTEUR_ID`=8585
     LEFT JOIN 
     `ods_obs_descript` AS DH
     ON A.`T_OBSERVATION_ID`=DH.`T_OBSERVATION_ID`
-    AND A.`session`=DH.`session`
     AND DH.`T_DESCRIPTEUR_ID`=8591
 );
 

@@ -69,13 +69,13 @@ if [ "$resultado" == 0 ]; then
 fi
 
 
-# Comprimimos los logs de mas de 30 días
+# Comprimimos los logs de mas de 30 días (no pasa nada si falla)
 printf "Info: Comprimimos los logs de mas de %s días.\n" "$logfile_compress"
-find "$logs_path""$logfile_prefix"*.log -type f -mtime +"$logfile_compress" -execdir tar --remove-files -cvz --file {}.tar.gz {} \;
+find "$logs_path""$logfile_prefix"*.log -type f -mtime +"$logfile_compress" -execdir tar --remove-files -cvz --file {}.tar.gz {} \; 2>/dev/null
 
-# Borramos los logs (comprimidos) de mas de 90 días
+# Borramos los logs (comprimidos) de mas de 90 días (no pasa nada si falla)
 printf "Info: Borramos los logs comprimidos de mas de %s días.\n" "$logfile_del"
-find "$logs_path""$logfile_prefix"*.tar.gz -type f -mtime +"$logfile_del" -delete;
+find "$logs_path""$logfile_prefix"*.tar.gz -type f -mtime +"$logfile_del" -delete; 2>/dev/null
 
 # Devolvemos el resultado combinado del sql y del tar
 if [ "$resultado" -eq 0 ]; then
