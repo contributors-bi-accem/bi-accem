@@ -31,7 +31,8 @@ SELECT `T_MODALITE_ID`,
 `T_DESCRIPTEUR_ID`,
 `visible`,
 @data_date
-FROM `egorrion`.`modalite`;
+FROM `egorrion`.`modalite`
+LIMIT 1000;
 
 
 -- Recarga de la tabla observation
@@ -48,7 +49,8 @@ SELECT `T_OBSERVATION_ID`,
 `accem`,
 `export`,
 @data_date
-FROM `egorrion`.`observation`;
+FROM `egorrion`.`observation`
+LIMIT 1000;
 
 -- Recarga de la tabla obs_descript
 -- SET autocommit=0; -- permite mejorar el rendimiento
@@ -65,7 +67,8 @@ SELECT `T_DESCRIPTEUR_ID`,
 @data_date 
 FROM `egorrion`.`obs_descript`
 WHERE `Fecha_Modificacion` >= @from_ts 
-AND   `Fecha_Modificacion` < @to_ts;
+AND   `Fecha_Modificacion` < @to_ts
+LIMIT 1000;
 -- COMMIT;
 
 -- Recarga de la tabla obs_mod
@@ -83,7 +86,8 @@ SELECT `id_obs_mod`,
 FROM `egorrion`.`obs_mod`
 WHERE `Fecha_Modificacion` >= @from_ts 
 AND   `Fecha_Modificacion` < @to_ts
-ORDER BY `T_OBSERVATION_ID`,`T_MODALITE_ID`,`session`,`date_debut`,`date_fin`,`id_enq`;
+ORDER BY `T_OBSERVATION_ID`,`T_MODALITE_ID`,`session`,`date_debut`,`date_fin`,`id_enq`
+LIMIT 1000;
 -- COMMIT;
 
 -- SET autocommit=1;
