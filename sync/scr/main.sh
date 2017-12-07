@@ -38,22 +38,6 @@ resultado=0;
 
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
 
-# Lanzamos la descarga en remoto
-ssh -p "$port" -i "$private_key" "$user"@"$server" "$remote_scr_dir"unload.sh
-resultado=$?
-
-# Recuperamos los ficheros
-if [ "$resultado" == 0 ]; then
-    "$base_dir"scr/remote-copy.sh
-    resultado=$?
-fi
-
-# Lanzamos el loader
-if [ "$resultado" == 0 ]; then
-    "$base_dir"scr/loader.sh
-    resultado=$?
-fi
-
 # Lanzamos el staging
 if [ "$resultado" == 0 ]; then
     sql_file="$base_dir"sql/staging.sql

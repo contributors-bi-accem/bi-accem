@@ -28,12 +28,6 @@ resultado=0;
 
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
 
-# comprobamos si se puede leer el fichero de credenciales
-if [ ! -e "$mysql_loginpath" ]; then
-    printf "Error: no se puede acceder al fichero de credenciales MySQL %s.\n" "$mysql_loginpath" >&2
-    exit 1;
-fi 
-
 sql_file="$1"
 if [ ! -e "$sql_file" ]; then
     printf "Error: no se puede acceder al fichero SQL %s.\n" "$sql_file" >&2
@@ -42,7 +36,7 @@ fi
 
 # lanzamos el script sql
 #sql_file="$base_dir"sql/staging.sql
-mysql --login-path="$mysql_loginpath" -vv --database="$mysql_db" --show-warnings --execute="source ${sql_file};"
+mysql --user="$mysql_user" --password="$mysql_pass" -vv --database="$mysql_db" --show-warnings --execute="source ${sql_file};"
 
 resultado=$?
 
