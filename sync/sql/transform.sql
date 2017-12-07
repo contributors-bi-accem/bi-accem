@@ -25,8 +25,7 @@ REPLACE INTO `th_obs_mod`
     `ObservationPublic`,
     `ObservationValide`,
     `verouiller`,
-    `ods_obs_mod`.`data_date` as `data_date`,
-    @load_ts
+    `data_date`
     FROM  
     `ods_obs_mod`
     LEFT JOIN 
@@ -115,8 +114,7 @@ REPLACE INTO `th_prestaciones`
     DH.`valeur` as `Fecha Nacimiento`,
     L.`T_MODALITE_ID` as cod_solprotec,
     M.`T_MODALITE_ID` as cod_inmi,
-    A.`data_date`,
-    @load_ts
+    A.`data_date`
     FROM  
     (SELECT 
     `T_OBSERVATION_ID`,
@@ -286,14 +284,12 @@ REPLACE INTO `td_prestacion`
     SELECT 
     A.`cod_prest`,
     B.`LibelleModalite` as `Prestación`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_prest`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=9074
@@ -309,14 +305,12 @@ REPLACE INTO `td_tipoprograma`
     SELECT 
     A.`cod_tiprog`,
     B.`LibelleModalite` as `Tipo de Programa`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_tiprog`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8620
@@ -332,14 +326,12 @@ REPLACE INTO `td_finprograma`
     SELECT 
     A.`cod_finprog`,
     B.`LibelleModalite` as `Financiación del Programa`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_finprog`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8621
@@ -355,14 +347,12 @@ REPLACE INTO `td_convprograma`
     SELECT 
     A.`cod_convprog`,
     B.`LibelleModalite` as `Convocatoria del programa`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_convprog`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=9109
@@ -378,14 +368,12 @@ REPLACE INTO `td_provincia`
     SELECT 
     A.`cod_prov`,
     B.`LibelleModalite` as `Provincia`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_prov`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8945
@@ -401,14 +389,12 @@ REPLACE INTO `td_comunidad`
     SELECT 
     A.`cod_comu`,
     B.`LibelleModalite` as `Comunidad`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_comu`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8947
@@ -424,14 +410,12 @@ REPLACE INTO `td_nacionalidad`
     SELECT 
     A.`cod_nacion`,
     B.`LibelleModalite` as `Nacionalidad`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_nacion`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8593
@@ -447,14 +431,12 @@ REPLACE INTO `td_pais`
     SELECT 
     A.`cod_pais`,
     B.`LibelleModalite` as `Pais de Nacimiento`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_pais`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8592
@@ -470,14 +452,12 @@ REPLACE INTO `td_situadmin`
     SELECT 
     A.`cod_situadmin`,
     B.`LibelleModalite` as `Situación administrativa`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_situadmin`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8610
@@ -493,14 +473,12 @@ REPLACE INTO `td_nivelestud`
     SELECT 
     A.`cod_nivelstud`,
     B.`LibelleModalite` as `Nivel de estudios`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_nivelstud`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8619
@@ -516,14 +494,12 @@ REPLACE INTO `td_genero`
     SELECT 
     A.`cod_genero`,
     B.`LibelleModalite` as `Sexo`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_genero`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8590
@@ -539,14 +515,12 @@ REPLACE INTO `td_solprotec`
     SELECT 
     A.`cod_solprotec`,
     B.`LibelleModalite` as `Solicitante de protección internacional`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_solprotec`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8611
@@ -562,14 +536,12 @@ REPLACE INTO `td_inmigrante`
     SELECT 
     A.`cod_inmi`,
     B.`LibelleModalite` as `Inmigrante`,
-    A.`data_date`,
-    A.`load_date`
+    A.`data_date`
     FROM
     (SELECT 
     `T_DESCRIPTEUR_ID`,
     `T_MODALITE_ID` as `cod_inmi`,
-    MAX(`data_date`) as `data_date`,
-    @load_ts as `load_date`
+    MAX(`data_date`) as `data_date`
     FROM 
     `th_obs_mod`
     WHERE `T_DESCRIPTEUR_ID`=8612
