@@ -84,6 +84,11 @@ if [ "$resultado" == 0 ]; then
     mysql --user="$mysql_user" --password="$mysql_pass" -vv --database="$mysql_db" --show-warnings \
     --execute="SET @from_ts='${from_ts}'; SET @to_ts='${to_ts}'; source ${sql_file};"
     resultado=$?
+    # Si todo ha ido bien, guardamos la fecha en el fichero lastdatefile para la proxima ejecución.
+    if [ "$resultado" == 0 ]; then
+        echo "$to_ts" > "$lastdatefile";
+        printf "Info: Actualizado la fecha a %s en el archivo %s\n" "$to_ts" "$lastdatefile"
+    fi
 fi
 
 # Lanzamos las transformaciones
