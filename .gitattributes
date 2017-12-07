@@ -1,0 +1,2 @@
+Forzar los ficheros de texto en modo UNIX, incluso en plataforma windows
+* text eol=lf
