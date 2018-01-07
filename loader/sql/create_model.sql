@@ -284,10 +284,10 @@ CREATE TABLE IF NOT EXISTS `ods_obs_mod` (
   `data_date` timestamp NULL,   
   `load_date` timestamp NULL,   
   UNIQUE KEY (`id_obs_mod`),
-  INDEX obs_mod_key (`T_OBSERVATION_ID`,`T_MODALITE_ID`,`session`,`date_debut`,`date_fin`,`id_enq`),
-  INDEX obs_mod_observation (`T_OBSERVATION_ID`),
-  INDEX obs_mod_modalite (`T_MODALITE_ID`),
-  INDEX obs_mod_dd (`data_date`)
+  INDEX obsmod_key (`T_OBSERVATION_ID`,`T_MODALITE_ID`,`session`,`date_debut`,`date_fin`,`id_enq`),
+  INDEX obsmod_observation (`T_OBSERVATION_ID`),
+  INDEX obsmod_modalite (`T_MODALITE_ID`),
+  INDEX obsmod_dd (`data_date`)
 );
 -- CREATE INDEX ind_prestaciones ON ods_obs_mod (`T_OBSERVATION_ID`,`T_MODALITE_ID`,`session`,`date_debut`,`date_fin`,`id_enq`) ;
 /*PARTITION BY RANGE(`Fecha_Modificacion`) (
@@ -418,6 +418,104 @@ CREATE TABLE IF NOT EXISTS `ods_succursale_groupe` (
 --  
 -- --------------------------------------------------------
 
+-- vista intermedia para unir las modalite y los descripteur
+-- del questionario 453
+CREATE VIEW `v_modalite_descripteur` AS 
+    SELECT A.`T_MODALITE_ID`,
+    trim(A.`CodeModalite`) as `CodeModalite`,
+    trim(A.`LibelleModalite`) as `LibelleModalite`, 
+    trim(A.`TypeModalite`) as `TypeModalite`,
+    A.`RangModalite`,
+    A.`T_DESCRIPTEUR_ID`, 
+    trim(B.`CodeDescripteur`) as `CodeDescripteur`,
+    trim(B.`LibelleDescripteur`) as `LibelleDescripteur`,  
+    trim(B.`SautDescripteur`) as `SautDescripteur`,
+    replace(replace(replace(trim(B.`SautDescripteur`),'!',''),'(',''),')','') as `CodeModalitePadre`,
+    B.`isSession`,
+    A.`data_date`
+    FROM `ods_modalite` A 
+    JOIN `ods_descripteur` B ON A.`T_DESCRIPTEUR_ID`=B.`T_DESCRIPTEUR_ID`
+    AND B.`T_QUESTIONNAIRE_ID`=453;
+
+-- Esa tabla almacena la jerarquia modalite -> descripteur -> descripteur padre
+CREATE TABLE IF NOT EXISTS `jer_modalite_descripteur` (
+`T_MODALITE_ID`             int(11),
+`CodeModalite`              varchar(20) NULL,
+`LibelleModalite`           varchar(150) NULL,
+`TypeModalite`              varchar(25) NULL,
+`RangModalite`              int(11) NULL,
+`T_DESCRIPTEUR_ID`          int(11),
+`CodeDescripteur`           varchar(50) NULL,
+`LibelleDescripteur`        varchar(255) NULL,
+`SautDescripteur`           varchar(255) NULL,
+`isSession`                 tinyint(1) NULL,
+`id_descripteur_padre`      int(11),
+`code_descripteur_padre`    varchar(50) NULL,
+`libelle_descripteur_padre` varchar(255) NULL,
+`data_date`                 timestamp NULL,
+UNIQUE KEY (`T_MODALITE_ID`),
+INDEX jermodesc_descripteur (`T_DESCRIPTEUR_ID`),
+INDEX jermodesc_desc_padre (`id_descripteur_padre`),
+INDEX jermodesc_modrang (`T_MODALITE_ID`,`RangModalite`)
+);
+
+
+/*
+jerarquia financiación y programas: los "descripteur" que permiten deducir el tipo de financiación
+son 4 preguntas anidadas que conforman una jerarquia:
+
+1.  Tipo de Programa
+    8620 Tipo de Programa
+
+2.  Financiación del Programa
+    8621 Financiación del Programa
+    8945 Provincia
+    8947 Comunidad
+    9095 Financiación del programa internacional
+
+3.  Convocatoria del programa
+    8625    Programa estatal Real Decreto
+    8627    Programa estatal Retorno Voluntario:
+    8968    Localidades provincia Sevilla
+    etc..
+
+4.  Programas Locales 
+    8949    Programas de Arcos de la Frontera
+    8950    Programas de Cadiz
+    etc...
+*/
+
+CREATE VIEW v_jer_programas AS
+    SELECT A.`T_DESCRIPTEUR_ID` as `descripteur_nivel1`,
+    B.`T_DESCRIPTEUR_ID` as `descripteur_nivel2`,
+    C.`T_DESCRIPTEUR_ID` as `descripteur_nivel3`,
+    D.`T_DESCRIPTEUR_ID` as `descripteur_nivel4` 
+    FROM jer_modalite_descripteur A
+    LEFT JOIN jer_modalite_descripteur B ON A.`T_DESCRIPTEUR_ID`=B.`id_descripteur_padre`
+    LEFT JOIN jer_modalite_descripteur C ON B.`T_DESCRIPTEUR_ID`=C.`id_descripteur_padre`
+    LEFT JOIN jer_modalite_descripteur D ON C.`T_DESCRIPTEUR_ID`=D.`id_descripteur_padre`
+    WHERE A.`T_DESCRIPTEUR_ID`=8620 -- raiz
+    GROUP BY `descripteur_nivel1`,`descripteur_nivel2`,`descripteur_nivel3`,`descripteur_nivel4`;
+
+/*
+
+1. Tipo de prestación
+    9074    Tipo de Prestación
+2. Prestación
+    8633    Traducción
+    etc...
+*/
+
+CREATE VIEW v_jer_prestaciones AS
+    SELECT A.`T_DESCRIPTEUR_ID` as `descripteur_nivel1`,
+    B.`T_DESCRIPTEUR_ID` as `descripteur_nivel2`
+    FROM jer_modalite_descripteur A
+    LEFT JOIN jer_modalite_descripteur B ON A.`T_DESCRIPTEUR_ID`=B.`id_descripteur_padre`
+    WHERE A.`T_DESCRIPTEUR_ID`=9074 -- raiz
+    GROUP BY `descripteur_nivel1`,`descripteur_nivel2`;
+
+
+
 CREATE TABLE IF NOT EXISTS `td_prestacion` (
 `cod_prest` int(11),
 `Prestación` varchar(150) NULL,
@@ -537,18 +635,43 @@ CREATE TABLE IF NOT EXISTS `th_obs_mod` (
 `CodeObservation` varchar(50) NULL,
 `created` datetime NULL,
 `id_enqu` int(11) NULL,
-`ObservationPublic` varchar(10) NULL,
-`ObservationValide` varchar(10) NULL,
-`verouiller` binary(1),
+`TypeModalite` varchar(25) NULL,
+`RangModalite` int(11) NULL,
+`id_descripteur_padre` int(11) NULL,
 `data_date` timestamp NULL,
-`load_date` timestamp NULL, 
--- UNIQUE KEY (`T_OBSERVATION_ID`,`T_DESCRIPTEUR_ID`,`session`,`T_MODALITE_ID`)
 UNIQUE KEY (`id_obs_mod`),
-INDEX th_obs_mod_sesion_modalite (`T_OBSERVATION_ID`,`T_DESCRIPTEUR_ID`,`session`,`T_MODALITE_ID`),
-INDEX th_obs_mod_date (`T_DESCRIPTEUR_ID`,`T_MODALITE_ID`,`data_date`),
-INDEX th_obs_mod_dd(`data_date`)
+INDEX thobsmod_obs_sesion (`T_OBSERVATION_ID`,`session`),
+INDEX thobsmod_sesion_modalite (`T_OBSERVATION_ID`,`session`,`T_DESCRIPTEUR_ID`,`T_MODALITE_ID`),
+INDEX thobsmod_desc_mod_dd (`T_DESCRIPTEUR_ID`,`T_MODALITE_ID`,`data_date`),
+INDEX thobsmod_dd(`data_date`)
 );
 
+
+CREATE TABLE IF NOT EXISTS `th_hist_situacion_usuarios` (
+`T_OBSERVATION_ID` int(11),
+`CodeObservation` varchar(50) NULL,
+`session` int(11) NULL,
+`created` datetime NULL,
+`id_enqu` int(11) NULL,
+`date_nacionalidad` datetime NULL,
+`nacionalidad` int(11) NULL,
+`date_sitadmin` datetime NULL,
+`sitadmin` int(11) NULL,
+`date_solprotec` datetime NULL,
+`solprotec` int(11) NULL,
+`date_inmigrante` datetime NULL,
+`inmigrante` int(11) NULL,
+`date_estudios` datetime NULL,
+`estudios` int(11) NULL,
+`com_nacionalidad` longtext NULL,
+`com_sitadmin` longtext NULL,
+`com_solprotec` longtext NULL,
+`com_inmigrante` longtext NULL,
+`com_estudios` longtext NULL,
+`data_date` timestamp NULL,
+UNIQUE KEY (`T_OBSERVATION_ID`,`session`),
+INDEX ind_thsitusuarios_dd(`data_date`)
+);
 
 CREATE TABLE IF NOT EXISTS `th_prestaciones` (
 `T_OBSERVATION_ID` int(11),
@@ -556,9 +679,6 @@ CREATE TABLE IF NOT EXISTS `th_prestaciones` (
 `session` int(11) NULL,
 `created` datetime NULL,
 `id_enqu` int(11) NULL,
-`ObservationPublic` varchar(10) NULL,
-`ObservationValide` varchar(10) NULL,
-`verouiller` binary(1),
 `date_debut` datetime NULL,
 `date_fin` datetime NULL, 
 `cod_prest` int(11) NULL, 

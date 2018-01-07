@@ -16,6 +16,8 @@ DROP TABLE `stg_groupe`;
 DROP TABLE `stg_lier_groupe`;
 DROP TABLE `stg_liste_droits`;
 DROP TABLE `stg_succursale_groupe`;
+
+
 DROP TABLE `ods_descripteur`;
 DROP TABLE `ods_modalite`;
 DROP TABLE `ods_observation`;
@@ -28,6 +30,8 @@ DROP TABLE `ods_groupe`;
 DROP TABLE `ods_lier_groupe`;
 DROP TABLE `ods_liste_droits`;
 DROP TABLE `ods_succursale_groupe`;
+
+DROP VIEW  `v_modalite_descripteur`;
 DROP TABLE `td_prestacion`;
 DROP TABLE `td_tipoprograma`;
 DROP TABLE `td_finprograma`;
