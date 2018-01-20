@@ -63,136 +63,12 @@ REPLACE INTO `th_obs_mod`
 );
 
 
-/*
-Historico situación usuario (sujeta a sesión)
-T_DESCRIPTEUR_ID	LibelleDescripteur
-8593	Nacionalidad
-8610	Situación administrativa
-8611	Solicitante de protección internacional
-8612	Inmigrante
-8619	Estudios finalizados
 
-A revisar:
+/* A revisar:
 8962	Programas en Loja:
 9067	Nï¿½mero de horas de interpretaciï¿½n: 
 9068	Nï¿½mero de hojas traducidas-Traducciï¿½n:
 */
-
-CREATE VIEW `v_hist_situsua_ori`
-(
-    SELECT 
-    A.`T_OBSERVATION_ID`,
-    A.`CodeObservation`,
-    A.`session`,
-    A.`created`,
-    A.`id_enqu`,
-    B.`date_debut` as `fecha_nacionalidad`,
-    B.`T_MODALITE_ID` as `nacionalidad`,
-    C.`date_debut` as `fecha_sitadmin`,
-    C.`T_MODALITE_ID` as `sitadmin`,
-    D.`date_debut` as `fecha_solprotec`,
-    D.`T_MODALITE_ID` as `solprotec`,
-    E.`date_debut` as `fecha_inmigrante`,
-    E.`T_MODALITE_ID` as `inmigrante`,
-    F.`date_debut` as `fecha_estudios`,
-    F.`T_MODALITE_ID` as `estudios`,
-    G.`valeur` as `com_nacionalidad`,
-    H.`valeur` as `com_sitadmin`,
-    I.`valeur` as `com_solprotec`,
-    J.`valeur` as `com_inmigrante`,
-    K.`valeur` as `com_estudios`,
-    A.`data_date`
-    FROM
-    (SELECT 
-    `T_OBSERVATION_ID`,
-    `session`,
-    max(`CodeObservation`) as `CodeObservation`,
-    max(`created`) as `created`,
-    max(`id_enqu`) as `id_enqu`,
-    max(`data_date`) as `data_date`
-    FROM 
-    `th_obs_mod`
-    WHERE 
-    `data_date`>(SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `th_hist_situacion_usuarios`)
-    GROUP BY `T_OBSERVATION_ID`,`session`    
-    ORDER BY  `T_OBSERVATION_ID`,`session` asc) as A
-    LEFT JOIN 
-    (SELECT 
-    `T_OBSERVATION_ID`,
-    `session`,
-    `date_debut`,
-    `T_MODALITE_ID`
-    FROM `th_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=8593) AS B -- Nacionalidad
-    ON A.`T_OBSERVATION_ID`=B.`T_OBSERVATION_ID`
-    AND A.`session`=B.`session`
-    LEFT JOIN 
-    (SELECT 
-    `T_OBSERVATION_ID`,
-    `session`,
-    `date_debut`,
-    `T_MODALITE_ID`
-    FROM `th_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=8610) AS C -- Situación administrativa
-    ON A.`T_OBSERVATION_ID`=C.`T_OBSERVATION_ID`
-    AND A.`session`=C.`session`
-    LEFT JOIN 
-    (SELECT 
-    `T_OBSERVATION_ID`,
-    `session`,
-    `date_debut`,
-    `T_MODALITE_ID`
-    FROM `th_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=8611) AS D -- Solicitante de protección internacional
-    ON A.`T_OBSERVATION_ID`=D.`T_OBSERVATION_ID`
-    AND A.`session`=D.`session`
-    LEFT JOIN 
-    (SELECT 
-    `T_OBSERVATION_ID`,
-    `session`,
-    `date_debut`,
-    `T_MODALITE_ID`
-    FROM `th_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=8612) AS E -- Inmigrante
-    ON A.`T_OBSERVATION_ID`=E.`T_OBSERVATION_ID`
-    AND A.`session`=E.`session`
-    LEFT JOIN 
-    (SELECT 
-    `T_OBSERVATION_ID`,
-    `session`,
-    `date_debut`,
-    `T_MODALITE_ID`
-    FROM `th_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=8619) AS F -- Estudios finalizados
-    ON A.`T_OBSERVATION_ID`=F.`T_OBSERVATION_ID`
-    AND A.`session`=F.`session`
-    -- y añadimos los eventuales comentarios en cada momento
-    LEFT JOIN 
-    `ods_obs_descript` AS G
-    ON A.`T_OBSERVATION_ID`=G.`T_OBSERVATION_ID`
-    AND A.`session`=G.`session`
-    AND G.`T_DESCRIPTEUR_ID`=8593
-    LEFT JOIN 
-    `ods_obs_descript` AS H
-    ON A.`T_OBSERVATION_ID`=H.`T_OBSERVATION_ID`
-    AND A.`session`=H.`session`
-    AND H.`T_DESCRIPTEUR_ID`=8610
-    LEFT JOIN 
-    `ods_obs_descript` AS I
-    ON A.`T_OBSERVATION_ID`=I.`T_OBSERVATION_ID`
-    AND A.`session`=I.`session`
-    AND I.`T_DESCRIPTEUR_ID`=8611
-    LEFT JOIN 
-    `ods_obs_descript` AS J
-    ON A.`T_OBSERVATION_ID`=J.`T_OBSERVATION_ID`
-    AND A.`session`=J.`session`
-    AND J.`T_DESCRIPTEUR_ID`=8612
-    LEFT JOIN
-    `ods_obs_descript` AS K
-    ON A.`T_OBSERVATION_ID`=K.`T_OBSERVATION_ID`
-    AND A.`session`=K.`session`
-    AND K.`T_DESCRIPTEUR_ID`=8619
-);
 
 
 SELECT @nacionalidad:=0;
@@ -214,47 +90,47 @@ REPLACE INTO `th_hist_situacion_usuarios`
     -- B.`T_MODALITE_ID` as `nacionalidad_`,
     
     -- si la fecha es nula, usar la anterior. Si la fecha es superior a la anterior y misma nacionalidad, usar la anterior, sino usar la nueva fecha
-    @date_nacionalidad := if(A.`T_OBSERVATION_ID`=@id, if( (B.`date_debut` IS NULL) || (B.`date_debut` > @date_nacionalidad && B.`T_MODALITE_ID` = @nacionalidad), @date_nacionalidad, B.`date_debut`), B.`date_debut`) as `fecha_nacionalidad`,
+    @date_nacionalidad := if(`T_OBSERVATION_ID`=@id, if( (`date_debut` IS NULL) || (`date_debut` > @date_nacionalidad && `T_MODALITE_ID` = @nacionalidad), @date_nacionalidad, `date_debut`), `date_debut`) as `fecha_nacionalidad`,
     -- si el usuario es el mismo (mismo T_OBSERVATION_ID): si la nacionalidad es nula, coger la anterior.
-    @nacionalidad := if(A.`T_OBSERVATION_ID`=@id,ifnull(B.`T_MODALITE_ID`,@nacionalidad),B.`T_MODALITE_ID`) as `nacionalidad`,
+    @nacionalidad := if(`T_OBSERVATION_ID`=@id,ifnull(`T_MODALITE_ID`,@nacionalidad),`T_MODALITE_ID`) as `nacionalidad`,
 
     -- C.`date_debut` as `fecha_sitadmin_`,
     -- C.`T_MODALITE_ID` as `sitadmin_`,
 
-    @date_sitadmin := if(A.`T_OBSERVATION_ID`=@id,if(C.`date_debut` IS NULL || (C.`date_debut` > @date_sitadmin && C.`T_MODALITE_ID` = @sitadmin), @date_sitadmin, C.`date_debut`), C.`date_debut`) as `fecha_sitadmin`,
-    @sitadmin := if(A.`T_OBSERVATION_ID`=@id,ifnull(C.`T_MODALITE_ID`,@sitadmin),C.`T_MODALITE_ID`) as `sitadmin`,
+    @date_sitadmin := if(`T_OBSERVATION_ID`=@id,if(`date_debut` IS NULL || (`date_debut` > @date_sitadmin && `T_MODALITE_ID` = @sitadmin), @date_sitadmin, `date_debut`), `date_debut`) as `fecha_sitadmin`,
+    @sitadmin := if(`T_OBSERVATION_ID`=@id,ifnull(`T_MODALITE_ID`,@sitadmin),`T_MODALITE_ID`) as `sitadmin`,
     
     -- D.`date_debut` as `fecha_solprotec_`,
     -- D.`T_MODALITE_ID` as `solprotec_`,
  
-    @date_solprotec := if(A.`T_OBSERVATION_ID`=@id,if(D.`date_debut` IS NULL || (D.`date_debut` > @date_solprotec && D.`T_MODALITE_ID` = @solprotec), @date_solprotec, D.`date_debut`), D.`date_debut`) as `fecha_solprotec`,
-    @solprotec := if(A.`T_OBSERVATION_ID`=@id,ifnull(D.`T_MODALITE_ID`,@solprotec),D.`T_MODALITE_ID`) as `solprotec`,
+    @date_solprotec := if(`T_OBSERVATION_ID`=@id,if(`date_debut` IS NULL || (`date_debut` > @date_solprotec && `T_MODALITE_ID` = @solprotec), @date_solprotec, `date_debut`), `date_debut`) as `fecha_solprotec`,
+    @solprotec := if(`T_OBSERVATION_ID`=@id,ifnull(`T_MODALITE_ID`,@solprotec),`T_MODALITE_ID`) as `solprotec`,
     
     -- E.`date_debut` as `fecha_inmigrante_`,
     -- E.`T_MODALITE_ID` as `inmigrante_`,
     
-    @date_inmigrante := if(A.`T_OBSERVATION_ID`=@id,if(E.`date_debut` IS NULL || (E.`date_debut` > @date_inmigrante && E.`T_MODALITE_ID` = @inmigrante), @date_inmigrante, E.`date_debut`), E.`date_debut`) as `fecha_inmigrante`,
-    @inmigrante := if(A.`T_OBSERVATION_ID`=@id,ifnull(E.`T_MODALITE_ID`,@inmigrante),E.`T_MODALITE_ID`) as `inmigrante`,
+    @date_inmigrante := if(`T_OBSERVATION_ID`=@id,if(`date_debut` IS NULL || (`date_debut` > @date_inmigrante && `T_MODALITE_ID` = @inmigrante), @date_inmigrante, `date_debut`), `date_debut`) as `fecha_inmigrante`,
+    @inmigrante := if(`T_OBSERVATION_ID`=@id,ifnull(`T_MODALITE_ID`,@inmigrante),`T_MODALITE_ID`) as `inmigrante`,
     
     -- F.`date_debut` as `fecha_estudios_`,
     -- F.`T_MODALITE_ID` as `estudios_`,
 
-    @date_estudios := if(A.`T_OBSERVATION_ID`=@id,if(F.`date_debut` IS NULL || (F.`date_debut` > @date_estudios && F.`T_MODALITE_ID` = @estudios), @date_estudios, F.`date_debut`), F.`date_debut`) as `fecha_estudios`,
-    @estudios := if(A.`T_OBSERVATION_ID`=@id,ifnull(F.`T_MODALITE_ID`,@estudios),F.`T_MODALITE_ID`) as `estudios`,
+    @date_estudios := if(`T_OBSERVATION_ID`=@id,if(`date_debut` IS NULL || (`date_debut` > @date_estudios && `T_MODALITE_ID` = @estudios), @date_estudios, `date_debut`), `date_debut`) as `fecha_estudios`,
+    @estudios := if(`T_OBSERVATION_ID`=@id,ifnull(`T_MODALITE_ID`,@estudios),`T_MODALITE_ID`) as `estudios`,
     
     -- es importante dejar esa variable aqui para que al siguiente registro contenga el anterior T_OBSERVATION_ID
-    @id:=A.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
-    A.`CodeObservation`,
-    A.`session`,
-    A.`created`,
-    A.`id_enqu`,
-    G.`valeur` as `com_nacionalidad`,
-    H.`valeur` as `com_sitadmin`,
-    I.`valeur` as `com_solprotec`,
-    J.`valeur` as `com_inmigrante`,
-    K.`valeur` as `com_estudios`,
-    A.`data_date`
-    FROM
+    @id:=`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
+    `CodeObservation`,
+    `session`,
+    `created`,
+    `id_enqu`,
+    `com_nacionalidad`,
+    `com_sitadmin`,
+    `com_solprotec`,
+    `com_inmigrante`,
+    `com_estudios`,
+    `data_date`
+    FROM v_hist_situsua_ori;
    
 
 

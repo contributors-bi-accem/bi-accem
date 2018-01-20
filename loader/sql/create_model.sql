@@ -514,6 +514,129 @@ CREATE VIEW v_jer_prestaciones AS
     WHERE A.`T_DESCRIPTEUR_ID`=9074 -- raiz
     GROUP BY `descripteur_nivel1`,`descripteur_nivel2`;
 
+/*
+Historico situación usuario (sujeta a sesión)
+T_DESCRIPTEUR_ID	LibelleDescripteur
+8593	Nacionalidad
+8610	Situación administrativa
+8611	Solicitante de protección internacional
+8612	Inmigrante
+8619	Estudios finalizados
+*/
+CREATE VIEW `v_hist_situsua_ori`
+AS SELECT 
+    A.`T_OBSERVATION_ID`,
+    A.`CodeObservation`,
+    A.`session`,
+    A.`created`,
+    A.`id_enqu`,
+    B.`date_debut` as `fecha_nacionalidad`,
+    B.`T_MODALITE_ID` as `nacionalidad`,
+    C.`date_debut` as `fecha_sitadmin`,
+    C.`T_MODALITE_ID` as `sitadmin`,
+    D.`date_debut` as `fecha_solprotec`,
+    D.`T_MODALITE_ID` as `solprotec`,
+    E.`date_debut` as `fecha_inmigrante`,
+    E.`T_MODALITE_ID` as `inmigrante`,
+    F.`date_debut` as `fecha_estudios`,
+    F.`T_MODALITE_ID` as `estudios`,
+    G.`valeur` as `com_nacionalidad`,
+    H.`valeur` as `com_sitadmin`,
+    I.`valeur` as `com_solprotec`,
+    J.`valeur` as `com_inmigrante`,
+    K.`valeur` as `com_estudios`,
+    A.`data_date`
+    FROM
+    (SELECT 
+    `T_OBSERVATION_ID`,
+    `session`,
+    max(`CodeObservation`) as `CodeObservation`,
+    max(`created`) as `created`,
+    max(`id_enqu`) as `id_enqu`,
+    max(`data_date`) as `data_date`
+    FROM 
+    `th_obs_mod`
+    WHERE 
+    `data_date`>(SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `th_hist_situacion_usuarios`)
+    GROUP BY `T_OBSERVATION_ID`,`session`    
+    ORDER BY  `T_OBSERVATION_ID`,`session` asc) as A
+    LEFT JOIN 
+    (SELECT 
+    `T_OBSERVATION_ID`,
+    `session`,
+    `date_debut`,
+    `T_MODALITE_ID`
+    FROM `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8593) AS B -- Nacionalidad
+    ON A.`T_OBSERVATION_ID`=B.`T_OBSERVATION_ID`
+    AND A.`session`=B.`session`
+    LEFT JOIN 
+    (SELECT 
+    `T_OBSERVATION_ID`,
+    `session`,
+    `date_debut`,
+    `T_MODALITE_ID`
+    FROM `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8610) AS C -- Situación administrativa
+    ON A.`T_OBSERVATION_ID`=C.`T_OBSERVATION_ID`
+    AND A.`session`=C.`session`
+    LEFT JOIN 
+    (SELECT 
+    `T_OBSERVATION_ID`,
+    `session`,
+    `date_debut`,
+    `T_MODALITE_ID`
+    FROM `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8611) AS D -- Solicitante de protección internacional
+    ON A.`T_OBSERVATION_ID`=D.`T_OBSERVATION_ID`
+    AND A.`session`=D.`session`
+    LEFT JOIN 
+    (SELECT 
+    `T_OBSERVATION_ID`,
+    `session`,
+    `date_debut`,
+    `T_MODALITE_ID`
+    FROM `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8612) AS E -- Inmigrante
+    ON A.`T_OBSERVATION_ID`=E.`T_OBSERVATION_ID`
+    AND A.`session`=E.`session`
+    LEFT JOIN 
+    (SELECT 
+    `T_OBSERVATION_ID`,
+    `session`,
+    `date_debut`,
+    `T_MODALITE_ID`
+    FROM `th_obs_mod`
+    WHERE `T_DESCRIPTEUR_ID`=8619) AS F -- Estudios finalizados
+    ON A.`T_OBSERVATION_ID`=F.`T_OBSERVATION_ID`
+    AND A.`session`=F.`session`
+    -- y añadimos los eventuales comentarios en cada momento
+    LEFT JOIN 
+    `ods_obs_descript` AS G
+    ON A.`T_OBSERVATION_ID`=G.`T_OBSERVATION_ID`
+    AND A.`session`=G.`session`
+    AND G.`T_DESCRIPTEUR_ID`=8593
+    LEFT JOIN 
+    `ods_obs_descript` AS H
+    ON A.`T_OBSERVATION_ID`=H.`T_OBSERVATION_ID`
+    AND A.`session`=H.`session`
+    AND H.`T_DESCRIPTEUR_ID`=8610
+    LEFT JOIN 
+    `ods_obs_descript` AS I
+    ON A.`T_OBSERVATION_ID`=I.`T_OBSERVATION_ID`
+    AND A.`session`=I.`session`
+    AND I.`T_DESCRIPTEUR_ID`=8611
+    LEFT JOIN 
+    `ods_obs_descript` AS J
+    ON A.`T_OBSERVATION_ID`=J.`T_OBSERVATION_ID`
+    AND A.`session`=J.`session`
+    AND J.`T_DESCRIPTEUR_ID`=8612
+    LEFT JOIN
+    `ods_obs_descript` AS K
+    ON A.`T_OBSERVATION_ID`=K.`T_OBSERVATION_ID`
+    AND A.`session`=K.`session`
+    AND K.`T_DESCRIPTEUR_ID`=8619
+;
 
 
 CREATE TABLE IF NOT EXISTS `td_prestacion` (
