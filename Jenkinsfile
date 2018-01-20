@@ -4,8 +4,14 @@ pipeline {
     stages {
         stage('Empaquetar') {
             steps {
+                script {
+                    env.RELEASE_DEPLOY= input message: 'User input required', ok: 'Deploy!',
+                            parameters: [choice(name: 'RELEASE_DEPLOY', choices: 'Yes\nNo', description: 'Deploy?')]
+                }
+                echo "${env.RELEASE_DEPLOY}"
                 echo 'Empaquetando..'
-                sh 'tar -cvf ${env.BUILD_ID}.tar.gz *'
+                PACKAGE_NAME = '$JOB_NAME_$BUILD_ID.tar.gz'
+                sh 'tar -cvf $PACKAGE_NAME *'
             }
         }
         stage('Test') {
