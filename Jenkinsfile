@@ -5,7 +5,7 @@ pipeline {
         stage('Empaquetar') {
             steps {
                 echo 'Empaquetando..'
-                ssh 'tar -cvf ${env.BUILD_ID}.tar.gz *'
+                sh 'tar -cvf ${env.BUILD_ID}.tar.gz *'
             }
         }
         stage('Test') {
