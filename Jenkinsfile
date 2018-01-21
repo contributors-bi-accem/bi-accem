@@ -10,8 +10,8 @@ pipeline {
                 }
                 echo "${env.RELEASE_DEPLOY}"
                 echo 'Empaquetando..'
-                env.PACKAGE_NAME = '$JOB_NAME_$BUILD_ID.tar.gz'
-                sh 'tar -cvf $PACKAGE_NAME *'
+                def package_name = '$JOB_NAME_$BUILD_ID.tar.gz'
+                sh 'tar -cvf ${package_name} *'
             }
         }
         stage('Test') {
