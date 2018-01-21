@@ -1,12 +1,13 @@
 pipeline {
     agent any
     environment {
-        PACKAGE_NAME = 'package_$BUILD_NB.tar.gz'
+        PACKAGE_NAME = "package_$BUILD_ID.tar.gz"
     }
     stages {
         stage('Empaquetar') {
             steps {
-                echo 'Empaquetando..'
+                echo "Empaquetando.. ${env.PACKAGE_NAME}"
+                
                 sh 'tar -cvf ${env.PACKAGE_NAME} *'
             }
         }
