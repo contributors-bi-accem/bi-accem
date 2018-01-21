@@ -12,12 +12,13 @@ pipeline {
         }
         stage('Deploy') {
             environment {
-                DIR = '/downloads/accem/'
+                DIR = '/downloads/accem/dist/'
             }
             steps {
-                echo "Deploying to ${env.DIR}"
+                echo "Sending package to ${env.DIR}"
                 sh "scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.DIR}"
-                sh 'ssh -l fabien -p 979 petitbilly "tar -xvf ${env.DIR}${env.PACKAGE_NAME} ${env.DIR}"'
+                echo ""
+                sh 'ssh -l fabien -p 979 petitbilly "tar -xzvf ${env.DIR}${env.PACKAGE_NAME}"'
             }
         }
         stage('Test') {
