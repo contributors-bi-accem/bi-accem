@@ -7,7 +7,7 @@ pipeline {
         stage('Empaquetar') {
             steps {
                 echo "Empaquetando.. ${env.PACKAGE_NAME}"
-                sh "tar -cvf ${env.PACKAGE_NAME} *"
+                sh "tar -czvf ${env.PACKAGE_NAME} *"
             }
         }
         stage('Deploy') {
@@ -16,9 +16,9 @@ pipeline {
             }
             steps {
                 echo "Sending package to ${env.DIR}"
-                sh "scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.DIR}"
-                echo ""
-                sh 'ssh -l fabien -p 979 petitbilly "tar -xzvf ${env.DIR}${env.PACKAGE_NAME}"'
+                sh "scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.DIR} && rm ${env.PACKAGE_NAME}"
+                echo "Uncompress ${env.DIR}${env.PACKAGE_NAME}"
+                sh "ssh -l fabien -p 979 petitbilly \"tar -xzvf ${env.DIR}${env.PACKAGE_NAME}\""
             }
         }
         stage('Test') {
