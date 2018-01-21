@@ -13,7 +13,7 @@ pipeline {
                 script {
                     echo "${env.RELEASE_DEPLOY}"
                     echo 'Empaquetando..'
-                    def package_name = '$JOB_NAME_$BUILD_ID.tar.gz'
+                    // def package_name = '$JOB_NAME_$BUILD_ID.tar.gz'
                     sh 'tar -cvf ${package_name} *'
                 }
             }
