@@ -1,31 +1,35 @@
 pipeline {
     agent any
-
-    environment { 
-        script {
-                    env.RELEASE_DEPLOY= input message: 'User input required', ok: 'Deploy!',
-                            parameters: [choice(name: 'RELEASE_DEPLOY', choices: 'Yes\nNo', description: 'Deploy?')]
-                }
+    environment {
+        PACKAGE_NAME = 'package_$BUILD_NB.tar.gz'
     }
     stages {
         stage('Empaquetar') {
             steps {
-                script {
-                    echo "${env.RELEASE_DEPLOY}"
-                    echo 'Empaquetando..'
-                    // def package_name = '$JOB_NAME_$BUILD_ID.tar.gz'
-                    sh 'tar -cvf ${package_name} *'
-                }
+                echo 'Empaquetando..'
+                sh 'tar -cvf ${env.PACKAGE_NAME} *'
+            }
+        }
+        stage('Deploy') {
+            environment {
+                DIR = '/downloads/accem/'
+            }
+            steps {
+                echo 'Deploying....'
+                sh 'scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.DIR}'
+                sh 'ssh -l fabien -p 979 petitbilly < tar -xvf ${env.DIR}${env.PACKAGE_NAME} ${env.DIR}'
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing..'
+
             }
         }
-        stage('Deploy') {
+        stage('HouseKeeping') {
             steps {
-                echo 'Deploying....'
+                echo 'Tidying up....'
+                cleanWs()
             }
         }
     }
