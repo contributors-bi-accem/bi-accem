@@ -23,7 +23,8 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo 'Testing..'
+                echo 'Unload'
+                sh "ssh -l fabien -p 979 petitbilly \"/downloads/accem/dist/unload/scr/unload.sh '31-01-2017 00:00:00' '31-01-2017 23:59:59' \""
 
             }
         }
