@@ -81,7 +81,7 @@ fi
 # Lanzamos el staging
 if [ "$resultado" == 0 ]; then
     sql_file="$base_dir"sql/staging.sql
-    mysql --user="$mysql_user" --password="$mysql_pass" -vv --database="$mysql_db" --show-warnings \
+    mysql --user="$mysql_user" --defaults-file="$mysql_cnfpath" -vv --database="$mysql_db" --show-warnings \
     --execute="SET @from_ts='${from_ts}'; SET @to_ts='${to_ts}'; source ${sql_file};"
     resultado=$?
     # Si todo ha ido bien, guardamos la fecha en el fichero lastdatefile para la proxima ejecución.
