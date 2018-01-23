@@ -15,15 +15,15 @@ pipeline {
             
             steps {
                 echo "Sending package to ${env.BASE_DIR}dist/"
-                sh "scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.BASE_DIR}dist/ && rm ${env.PACKAGE_NAME}"
+                sh "scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.BASE_DIR}dist/ && rm -f ${env.PACKAGE_NAME}"
                 echo "Uncompress ${env.BASE_DIR}dist/${env.PACKAGE_NAME}"
-                sh "ssh -l fabien -p 979 petitbilly \"tar -xzvf ${env.BASE_DIR}dist/${env.PACKAGE_NAME} -C ${env.BASE_DIR}dist/ && rm ${env.BASE_DIR}dist/${env.PACKAGE_NAME}\""
+                sh "ssh -l fabien -p 979 petitbilly \"tar -xzvf ${env.BASE_DIR}dist/${env.PACKAGE_NAME} -C ${env.BASE_DIR}dist/ && rm -f ${env.BASE_DIR}dist/${env.PACKAGE_NAME}\""
             }
         }
         stage('Test unload') {
             steps {
                 echo 'Unload 31-01-2017'
-                sh "ssh -l fabien -p 979 petitbilly \"rm ${env.BASE_DIR}unload_gorrion_*.tar.gz && ${env.BASE_DIR}dist/unload/scr/unload.sh '2017-01-31 00:00:00' '2017-01-31 23:59:59' \""
+                sh "ssh -l fabien -p 979 petitbilly \"rm -f ${env.BASE_DIR}unload_gorrion_*.tar.gz && ${env.BASE_DIR}dist/unload/scr/unload.sh '2017-01-31 00:00:00' '2017-01-31 23:59:59' \""
             }
         }
         stage('Test sync') {
