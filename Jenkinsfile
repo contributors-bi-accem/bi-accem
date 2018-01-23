@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         PACKAGE_NAME = "package_${BUILD_ID}.tar.gz"
-        BASE_DIR = '/downloads/accem/'
+        BASE_DIR = "/downloads/accem/"
     }
     stages {
         stage('Empaquetar') {
@@ -12,9 +12,7 @@ pipeline {
             }
         }
         stage('Deploy') {
-            environment {
-                
-            }
+            
             steps {
                 echo "Sending package to ${env.BASE_DIR}dist/"
                 sh "scp -BCp -P 979 ${env.PACKAGE_NAME} fabien@petitbilly:${env.BASE_DIR}dist/ && rm ${env.PACKAGE_NAME}"
