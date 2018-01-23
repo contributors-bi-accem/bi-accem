@@ -86,7 +86,7 @@ fi
 sql_file="$base_dir"sql/unload_gorrion.sql
 
 # lanzamos el script sql
-mysql --login-path="$mysql_loginpath" --database="$mysql_db" --execute=" \
+mysql --user="$mysql_user" --defaults-file="$mysql_cnfpath" --database="$mysql_db" --execute=" \
 SET @from_ts='${from_ts}'; \
 SET @to_ts='${to_ts}'; \
 SET @unload_dir='${unload_dir}'; \
