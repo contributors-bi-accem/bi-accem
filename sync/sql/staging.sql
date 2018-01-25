@@ -6,7 +6,7 @@ SET sql_mode='';
 
 
 -- recarga de la tabla descripteur
-REPLACE INTO @to_db.`ods_descripteur` 
+REPLACE INTO {to_db}.`ods_descripteur` 
 SELECT `T_DESCRIPTEUR_ID`,
 `LibelleDescripteur`,
 `SautDescripteur`,
@@ -18,11 +18,11 @@ SELECT `T_DESCRIPTEUR_ID`,
 `isSession`,
 `saisissable`,
 @data_date
-FROM @from_db.`descripteur`;
+FROM {from_db}.`descripteur`;
 
 
 -- Recarga de la tabla modalite
-REPLACE INTO @to_db.`ods_modalite`
+REPLACE INTO {to_db}.`ods_modalite`
 SELECT `T_MODALITE_ID`,
 `LibelleModalite`,
 `TypeModalite`,
@@ -31,11 +31,11 @@ SELECT `T_MODALITE_ID`,
 `T_DESCRIPTEUR_ID`,
 `visible`,
 @data_date
-FROM @from_db.`modalite`;
+FROM {from_db}.`modalite`;
 
 
 -- Recarga de la tabla observation
-REPLACE INTO @to_db.`ods_observation`  
+REPLACE INTO {to_db}.`ods_observation`  
 SELECT `T_OBSERVATION_ID`,
 `CodeObservation`,
 `ObservationPublic`,
@@ -48,12 +48,12 @@ SELECT `T_OBSERVATION_ID`,
 `accem`,
 `export`,
 @data_date
-FROM @from_db.`observation`;
+FROM {from_db}.`observation`;
 
 -- Recarga de la tabla obs_descript
 -- SET autocommit=0; -- permite mejorar el rendimiento
 
-REPLACE INTO @to_db.`ods_obs_descript` 
+REPLACE INTO {to_db}.`ods_obs_descript` 
 SELECT `T_DESCRIPTEUR_ID`,
 `T_OBSERVATION_ID`,
 `Valeur`,
@@ -63,13 +63,13 @@ SELECT `T_DESCRIPTEUR_ID`,
 `session`,
 `Fecha_Modificacion`,
 @data_date 
-FROM @from_db.`obs_descript`
+FROM {from_db}.`obs_descript`
 WHERE `Fecha_Modificacion` >= @from_ts 
 AND   `Fecha_Modificacion` < @to_ts;
 -- COMMIT;
 
 -- Recarga de la tabla obs_mod
-REPLACE INTO @to_db.`ods_obs_mod`  
+REPLACE INTO {to_db}.`ods_obs_mod`  
 SELECT `id_obs_mod`,
 `date_debut`,
 `date_fin`,
@@ -80,7 +80,7 @@ SELECT `id_obs_mod`,
 `session`,
 `Fecha_Modificacion`,
 @data_date
-FROM @from_db.`obs_mod`
+FROM {from_db}.`obs_mod`
 WHERE `Fecha_Modificacion` >= @from_ts 
 AND   `Fecha_Modificacion` < @to_ts
 ORDER BY `T_OBSERVATION_ID`,`T_MODALITE_ID`,`session`,`date_debut`,`date_fin`,`id_enq`;

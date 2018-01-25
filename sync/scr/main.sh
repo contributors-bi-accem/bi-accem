@@ -84,11 +84,25 @@ else
     to_ts=$str_now;
 fi
 
+# remplazamos variables en el fichero sql
+# fichero sql original
+sql_file="$base_dir"sql/staging.sql
+
+# fichero sql temporal con las variables sustituidas
+temp_sql_file="$base_dir"sql/.temp_staging.sql
+
+replacestr="s|{from_db}|"$mysql_orig_db"|g;s|{to_db}|"$mysql_db"|g";
+
+# remplazamos las cadenas de caracteres en el fichero sql
+sed -e "$replacestr" < "$sql_file" > "$temp_sql_file";
+
 # Lanzamos el staging
 if [ "$resultado" == 0 ]; then
+
     sql_file="$base_dir"sql/staging.sql
+    
     mysql --defaults-file="$mysql_cnfpath" --user="$mysql_user" -vv --database="$mysql_db" --show-warnings \
-    --execute="SET @from_ts='${from_ts}'; SET @to_ts='${to_ts}'; SET @from_db='${mysql_orig_db}'; SET @to_db='${mysql_db}'; source ${sql_file};"
+    --execute="SET @from_ts='${from_ts}'; SET @to_ts='${to_ts}'; source ${temp_sql_file};"
     resultado=$?
     # Si todo ha ido bien, guardamos la fecha en el fichero lastdatefile para la proxima ejecución.
     if [ "$resultado" == 0 ]; then
@@ -99,7 +113,9 @@ fi
 
 # Lanzamos las transformaciones
 if [ "$resultado" == 0 ]; then
+
     sql_file="$base_dir"sql/transform.sql
+
     mysql --defaults-file="$mysql_cnfpath" --user="$mysql_user" -vv --database="$mysql_db" --show-warnings \
     --execute="source ${sql_file};"
     resultado=$?
