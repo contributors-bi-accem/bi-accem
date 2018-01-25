@@ -41,8 +41,8 @@ lastdatefile="$base_dir"scr/.lastdate;
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
 
 # comprobamos si se puede leer el fichero de credenciales
-if [ ! -e "$mysql_loginpath" ]; then
-    printf "Error: no se puede acceder al fichero de credenciales MySQL %s.\n" "$mysql_loginpath" >&2
+if [ ! -e "$mysql_cnfpath" ]; then
+    printf "Error: no se puede acceder al fichero de credenciales MySQL %s.\n" "$mysql_cnfpath" >&2
     exit 1;
 fi 
 

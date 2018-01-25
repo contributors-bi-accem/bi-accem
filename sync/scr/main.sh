@@ -42,6 +42,12 @@ lastdatefile="$base_dir"scr/.lastdate;
 
 printf "\nInfo: Iniciando %s a las %s.\n" $0 "$str_now";
 
+# comprobamos si se puede leer el fichero de credenciales
+if [ ! -e "$mysql_cnfpath" ]; then
+    printf "Error: no se puede acceder al fichero de credenciales MySQL %s.\n" "$mysql_cnfpath" >&2
+    exit 1;
+fi 
+
 # Comprueba si el formato de una fecha es correcto y si es una fecha valida.
 # Parametros:   $1    el timestamp
 #               $2    el formato (regex)
@@ -94,7 +100,7 @@ fi
 # Lanzamos las transformaciones
 if [ "$resultado" == 0 ]; then
     sql_file="$base_dir"sql/transform.sql
-    mysql --user="$mysql_user" --password="$mysql_pass" -vv --database="$mysql_db" --show-warnings \
+    mysql --user="$mysql_user" --defaults-file="$mysql_cnfpath" -vv --database="$mysql_db" --show-warnings \
     --execute="source ${sql_file};"
     resultado=$?
 fi
