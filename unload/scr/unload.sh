@@ -86,7 +86,7 @@ fi
 sql_file="$base_dir"sql/unload_gorrion.sql
 
 # lanzamos el script sql
-mysql --user="$mysql_user" --defaults-file="$mysql_cnfpath" --database="$mysql_db" --execute=" \
+mysql --defaults-file="$mysql_cnfpath" --user="$mysql_user" --database="$mysql_db" --execute=" \
 SET @from_ts='${from_ts}'; \
 SET @to_ts='${to_ts}'; \
 SET @unload_dir='${unload_dir}'; \
@@ -121,6 +121,7 @@ for f in $patron_ficheros; do
 done
 
 # Si hay ficheros resultantes, los comprimimos en un tar.gz
+res_tar=0
 if [ "$files_exist" == "SI" ]; then
     tar --remove-files -czv --file "$fichero" $patron_ficheros
     res_tar=$?
