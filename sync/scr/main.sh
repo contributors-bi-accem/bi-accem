@@ -88,7 +88,7 @@ fi
 if [ "$resultado" == 0 ]; then
     sql_file="$base_dir"sql/staging.sql
     mysql --defaults-file="$mysql_cnfpath" --user="$mysql_user" -vv --database="$mysql_db" --show-warnings \
-    --execute="SET @from_ts='${from_ts}'; SET @to_ts='${to_ts}'; source ${sql_file};"
+    --execute="SET @from_ts='${from_ts}'; SET @to_ts='${to_ts}'; SET @from_db='${mysql_orig_db}'; SET @to_db='${mysql_db}'; source ${sql_file};"
     resultado=$?
     # Si todo ha ido bien, guardamos la fecha en el fichero lastdatefile para la proxima ejecución.
     if [ "$resultado" == 0 ]; then
