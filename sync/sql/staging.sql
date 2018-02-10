@@ -2,6 +2,7 @@
 SET @ts_format='%Y-%m-%d %H:%i:%S';
 SET @date_format='%Y-%m-%d';
 SET @data_date=NOW();
+SET @load_date=NOW();
 SET sql_mode='';
 
 
@@ -17,7 +18,8 @@ SELECT `T_DESCRIPTEUR_ID`,
 `description`,
 `isSession`,
 `saisissable`,
-@data_date
+@data_date,
+@load_date
 FROM {from_db}.`descripteur`;
 
 
@@ -30,7 +32,8 @@ SELECT `T_MODALITE_ID`,
 `RangModalite`,
 `T_DESCRIPTEUR_ID`,
 `visible`,
-@data_date
+@data_date,
+@load_date
 FROM {from_db}.`modalite`;
 
 
@@ -47,7 +50,8 @@ SELECT `T_OBSERVATION_ID`,
 `suivi`,
 `accem`,
 `export`,
-@data_date
+@data_date,
+@load_date
 FROM {from_db}.`observation`;
 
 -- Recarga de la tabla obs_descript
@@ -62,7 +66,8 @@ SELECT `T_DESCRIPTEUR_ID`,
 `suivi`,
 `session`,
 `Fecha_Modificacion`,
-@data_date 
+@data_date,
+@load_date
 FROM {from_db}.`obs_descript`
 WHERE `Fecha_Modificacion` >= @from_ts 
 AND   `Fecha_Modificacion` < @to_ts;
@@ -79,7 +84,8 @@ SELECT `id_obs_mod`,
 `id_enq`,
 `session`,
 `Fecha_Modificacion`,
-@data_date
+@data_date,
+@load_date
 FROM {from_db}.`obs_mod`
 WHERE `Fecha_Modificacion` >= @from_ts 
 AND   `Fecha_Modificacion` < @to_ts

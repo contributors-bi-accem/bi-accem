@@ -523,7 +523,7 @@ T_DESCRIPTEUR_ID	LibelleDescripteur
 8612	Inmigrante
 8619	Estudios finalizados
 */
-CREATE VIEW `v_hist_situsua_ori`
+CREATE TABLE `th_hist_situsua_temp`
 AS SELECT 
     A.`T_OBSERVATION_ID`,
     A.`CodeObservation`,
