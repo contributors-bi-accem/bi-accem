@@ -39,3 +39,4 @@ DROP TABLE IF EXISTS `th_hist_solprotec`;
 DROP TABLE IF EXISTS `th_hist_inmigrante`;
 DROP TABLE IF EXISTS `th_hist_estudios`;
 DROP TABLE IF EXISTS `th_prestaciones`;
+DROP TABLE IF EXISTS `th_detalle_usuarios`;

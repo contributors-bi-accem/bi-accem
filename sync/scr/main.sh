@@ -114,7 +114,7 @@ fi
 # Lanzamos las transformaciones
 if [ "$resultado" == 0 ]; then
 
-    sql_file="$base_dir"sql/transform.sql
+    sql_file="$base_dir"../common/sql/transform.sql
 
     mysql --defaults-file="$mysql_cnfpath" --user="$mysql_user" -vv --database="$mysql_db" --show-warnings \
     --execute="source ${sql_file};"

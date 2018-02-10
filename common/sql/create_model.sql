@@ -568,6 +568,7 @@ UNIQUE KEY (`T_OBSERVATION_ID`,`session`,`cod_prest`,`date_debut`,`date_fin`),
 INDEX th_prestaciones_dd(`data_date`)
 );
 
+/*
 
 -- tabla de detalle de los usuarios
 CREATE TABLE IF NOT EXISTS `th_detalle_usuarios` (
@@ -636,7 +637,7 @@ CREATE TABLE IF NOT EXISTS `th_detalle_usuarios` (
 
 UNIQUE KEY (`T_OBSERVATION_ID`)
 );
-
+*/
 
 -- dimensiones
 
