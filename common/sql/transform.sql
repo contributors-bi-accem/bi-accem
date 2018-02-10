@@ -1,7 +1,7 @@
 
 SET @ts_format='%Y-%m-%d %H:%i:%S';
 SET @date_format='%Y-%m-%d';
-SET @load_ts=NOW();
+SET @load_date=NOW();
 SET sql_mode='';
 
 -- v_modalite_descripteur
@@ -25,7 +25,8 @@ REPLACE INTO `jer_modalite_descripteur`
     B.`T_DESCRIPTEUR_ID` as id_descripteur_padre, 
     B.`CodeDescripteur` as code_descripteur_padre,
     B.`LibelleDescripteur` as libelle_descripteur_padre,
-    A.`data_date`
+    A.`data_date`,
+    @load_date as `load_date`
     FROM `v_modalite_descripteur` A 
     LEFT JOIN `v_modalite_descripteur` B 
     ON A.`CodeModalitePadre`=B.`CodeModalite`
@@ -49,7 +50,7 @@ REPLACE INTO `temp_obs_descript`
         WHEN  `T_DESCRIPTEUR_ID` IN (8613,8591)  THEN str_to_date(trim(`Valeur`),'%d-%m-%Y')
     END as `FechaValor`,
     `data_date`,
-    @load_date
+    @load_date as `load_date`
     FROM  `ods_obs_descript`
     WHERE length(trim(`Valeur`) > 0 -- filtra las respuestas vacias
     AND `ods_obs_descript`.`data_date` > (SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `temp_obs_descript`) 
@@ -76,7 +77,8 @@ REPLACE INTO `temp_obs_mod`
     `jer_modalite_descripteur`.`TypeModalite`,
     `jer_modalite_descripteur`.`RangModalite`,
     `jer_modalite_descripteur`.`id_descripteur_padre`,
-    `ods_obs_mod`.`data_date`
+    `ods_obs_mod`.`data_date`,
+    @load_date as `load_date`
     FROM  `ods_obs_mod`
     JOIN `jer_modalite_descripteur` -- con ese JOIN conseguimos los campos adicionales y filtramos las respuestas "Sans Objet"
     ON `ods_obs_mod`.`T_MODALITE_ID`=`jer_modalite_descripteur`.`T_MODALITE_ID`     
@@ -220,7 +222,7 @@ REPLACE INTO `th_hist_nacionalidad`
     @id:=T.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
     T.`session` as `session`,
     T.`data_date` as `data_date`,
-    @load_ts as `load_date`
+    @load_date as `load_date`
     FROM
     (SELECT 
     A.`T_OBSERVATION_ID`,
@@ -254,7 +256,7 @@ REPLACE INTO `th_hist_sitadmin`
     @id:=T.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
     T.`session` as `session`,
     T.`data_date` as `data_date`,
-    @load_ts as `load_date`
+    @load_date as `load_date`
     FROM
     (SELECT 
     A.`T_OBSERVATION_ID`,
@@ -288,7 +290,7 @@ REPLACE INTO `th_hist_solprotec`
     @id:=T.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
     T.`session` as `session`,
     T.`data_date` as `data_date`,
-    @load_ts as `load_date`
+    @load_date as `load_date`
     FROM
     (SELECT 
     A.`T_OBSERVATION_ID`,
@@ -323,7 +325,7 @@ REPLACE INTO `th_hist_inmigrante`
     @id:=T.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
     T.`session` as `session`,
     T.`data_date` as `data_date`,
-    @load_ts as `load_date`
+    @load_date as `load_date`
     FROM
     (SELECT 
     A.`T_OBSERVATION_ID`,
@@ -356,7 +358,7 @@ REPLACE INTO `th_hist_estudios`
     @id:=T.`T_OBSERVATION_ID` as `T_OBSERVATION_ID`,
     T.`session` as `session`,
     T.`data_date` as `data_date`,
-    @load_ts as `load_date`
+    @load_date as `load_date`
     FROM
     (SELECT 
     A.`T_OBSERVATION_ID`,
@@ -572,7 +574,7 @@ REPLACE INTO `th_prestaciones`
     IF(DG.`doc_siria`,true,false),
     
     A.`data_date`,
-    @load_date
+    @load_date as `load_date`
     FROM  
     (SELECT 
     `T_OBSERVATION_ID`,
