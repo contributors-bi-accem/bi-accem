@@ -52,7 +52,7 @@ REPLACE INTO `temp_obs_descript`
     `data_date`,
     @load_date as `load_date`
     FROM  `ods_obs_descript`
-    WHERE length(trim(`Valeur`) > 0 -- filtra las respuestas vacias
+    WHERE length(trim(`Valeur`)) > 0 -- filtra las respuestas vacias
     AND `ods_obs_descript`.`data_date` > (SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `temp_obs_descript`) 
 );
 
@@ -86,7 +86,7 @@ REPLACE INTO `temp_obs_mod`
     LEFT JOIN `ods_observation` -- con ese JOIN, conseguimos mas campos de los usuarios
     ON `ods_obs_mod`.`T_OBSERVATION_ID`=`ods_observation`.`T_OBSERVATION_ID` 
     
-    WHERE `jer_modalite_descripteur`.RangModalite > 0 -- filtra todas las respuestas "Sans Objet" y "RxWO" o similares 
+    WHERE `jer_modalite_descripteur`.`RangModalite` > 0 -- filtra todas las respuestas "Sans Objet" y "RxWO" o similares 
     AND `ods_obs_mod`.`data_date` > (SELECT IFNULL(max(`data_date`),'01-01-0001 00:00:00') FROM `temp_obs_mod`) 
 );
 

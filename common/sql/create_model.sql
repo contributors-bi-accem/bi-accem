@@ -382,7 +382,7 @@ CREATE TABLE IF NOT EXISTS `temp_obs_descript` (
 `FechaValor`            datetime NULL,
 `data_date`             timestamp NULL,
 `load_date`             timestamp NULL,
-UNIQUE KEY (`T_OBSERVATION_ID`,`T_DESCRIPTEUR_ID`,`session`),
+UNIQUE KEY (`T_OBSERVATION_ID`,`session`,`T_DESCRIPTEUR_ID`),
 INDEX temp_obs_desc_dd(`data_date`)
 );
 
@@ -400,13 +400,13 @@ CREATE TABLE IF NOT EXISTS `temp_obs_mod` (
 `CodeObservation`       varchar(50) NULL,
 `created`               datetime NULL,
 `id_enqu`               int(11) NULL,
-`ObservationPublic`     varchar(10) NULL,
-`ObservationValide`     varchar(10) NULL,
-`verouiller`            binary(1),
+`TypeModalite`          varchar(25) NULL,
+`RangModalite`          int(11) NULL,
+`id_descripteur_padre`  int(11) NULL,
 `data_date`             timestamp NULL,
 `load_date`             timestamp NULL,
 UNIQUE KEY (`id_obs_mod`),
-INDEX temp_obs_mod_sesion_modalite (`T_OBSERVATION_ID`,`T_DESCRIPTEUR_ID`,`session`,`T_MODALITE_ID`),
+INDEX temp_obs_mod_sesion_modalite (`T_OBSERVATION_ID`,`session`,`T_DESCRIPTEUR_ID`,`T_MODALITE_ID`),
 INDEX temp_obs_mod_date (`T_DESCRIPTEUR_ID`,`T_MODALITE_ID`,`data_date`),
 INDEX temp_obs_mod_dd(`data_date`)
 );
