@@ -215,7 +215,7 @@ REPLACE INTO `th_hist_nacionalidad`
 (
     SELECT
     -- si el usuario es el mismo (mismo T_OBSERVATION_ID): si la nacionalidad es nula, coger la anterior.
-    @fecha_fin := if(T.`T_OBSERVATION_ID`=@id,'9999-12-31',@fecha_inicio) as `fecha_fin`,
+    @fecha_fin := if(T.`T_OBSERVATION_ID`<>@id,'9999-12-31 23:59:59',@fecha_inicio) as `fecha_fin`,
     @fecha_inicio := T.`date_debut` as `fecha_inicio`,
     T.`T_MODALITE_ID` as `nacionalidad`,
     T.`valeur` as `comentario`,
@@ -249,7 +249,7 @@ SELECT @id:=0;
 REPLACE INTO `th_hist_sitadmin`
 (
     SELECT
-    @fecha_fin := if(T.`T_OBSERVATION_ID`=@id,'9999-12-31',@fecha_inicio) as `fecha_fin`,
+    @fecha_fin := if(T.`T_OBSERVATION_ID`<>@id,'9999-12-31 23:59:59',@fecha_inicio) as `fecha_fin`,
     @fecha_inicio := T.`date_debut` as `fecha_inicio`,
     T.`T_MODALITE_ID` as `sitadmin`,
     T.`valeur` as `comentario`,
@@ -283,7 +283,7 @@ SELECT @id:=0;
 REPLACE INTO `th_hist_solprotec`
 (
     SELECT
-     @fecha_fin := if(T.`T_OBSERVATION_ID`=@id,'9999-12-31',@fecha_inicio) as `fecha_fin`,
+     @fecha_fin := if(T.`T_OBSERVATION_ID`<>@id,'9999-12-31 23:59:59',@fecha_inicio) as `fecha_fin`,
     @fecha_inicio := T.`date_debut` as `fecha_inicio`,
     T.`T_MODALITE_ID` as `solprotec`,
     T.`valeur` as `comentario`,
@@ -318,7 +318,7 @@ SELECT @id:=0;
 REPLACE INTO `th_hist_inmigrante`
 (
     SELECT
-    @fecha_fin := if(T.`T_OBSERVATION_ID`=@id,'9999-12-31',@fecha_inicio) as `fecha_fin`,
+    @fecha_fin := if(T.`T_OBSERVATION_ID`<>@id,'9999-12-31 23:59:59',@fecha_inicio) as `fecha_fin`,
     @fecha_inicio := T.`date_debut` as `fecha_inicio`,
     T.`T_MODALITE_ID` as `inmigrante`,
     T.`valeur` as `comentario`,
@@ -604,7 +604,7 @@ REPLACE INTO `th_prestaciones`
     (SELECT 
     `T_OBSERVATION_ID`,
     `session`,
-    `T_MODALITE_ID`,
+    `T_MODALITE_ID`
     FROM `temp_obs_mod`, `v_jer_prestaciones`
     WHERE `temp_obs_mod`.`T_DESCRIPTEUR_ID`=`v_jer_prestaciones`.`descripteur_nivel1`) AS B -- un tipo de prestación
     ON A.`T_OBSERVATION_ID`=B.`T_OBSERVATION_ID`
@@ -646,16 +646,18 @@ REPLACE INTO `th_prestaciones`
     ON A.`T_OBSERVATION_ID`=F.`T_OBSERVATION_ID`
     AND A.`session`=F.`session`
 
-    
     LEFT JOIN
     (SELECT 
     `T_OBSERVATION_ID`,
     `session`,
     `T_MODALITE_ID`
     FROM `temp_obs_mod`
-    WHERE `T_DESCRIPTEUR_ID`=8592) AS L -- pais de nacimiento
+    WHERE `T_DESCRIPTEUR_ID`=8592 -- pais de nacimiento
+    AND `session` <= A.`session`
+    ORDER BY `session` DESC
+    LIMIT 1
+    ) AS L 
     ON A.`T_OBSERVATION_ID`=L.`T_OBSERVATION_ID`
-    AND A.`session`=L.`session`
     LEFT JOIN
     (SELECT 
     `T_OBSERVATION_ID`,
